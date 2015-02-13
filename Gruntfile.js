@@ -7,8 +7,8 @@ module.exports = function(grunt) {
 		meta: {
 			banner:
 				'/*!\n' +
-				' * Above the fold Optimization <%= pkg.version %> (<%= grunt.template.today("yyyy-mm-dd, HH:MM") %>)\n' +
-				' * By info@optimalisatie.nl / https://optimalisatie.nl/ \n' +
+				' * Above the fold Optimization <%= pkg.version %> (<%= grunt.template.today("yyyy-mm-dd") %>)\n' +
+				' * @link https://plugins.wordpress.org/above-the-fold-optimization/\n' +
 				' */'
 		},
 

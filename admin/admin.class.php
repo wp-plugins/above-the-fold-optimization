@@ -118,13 +118,13 @@ class Abovethefold_Admin {
 		<img src="/wp-content/plugins/abovethefold/admin/google-pagespeed-100.png" style="float:right; margin-top:10px;">
 		<p style="font-size:16px;">Need help obtaining a Google PageSpeed 100-score for mobile and desktop?<br />Contact me at <a href="mailto:info@optimalisatie.nl?subject=Above%20the%20fold">info@optimalisatie.nl</a> for paid optimization service.</p>
 		<p style="position:absolute;bottom:0px;right:10px;"><a href="admin.php?page=abovethefold&amp;hideadd=1" class="button">hide this message</a></p>
-        <p>Jan Jaap Hakvoort - <a href="https://optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">https://optimalisatie.nl/</a> - <a href="https://github.com/optimalisatie" target="_blank">Github</a> - <a href="http://plugins.wordpress.org/above-the-fold-optimization/" target="_blank">Report bugs</a></p>
+        <p>Jan Jaap Hakvoort &dash; <a href="https://optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">https://optimalisatie.nl/</a> &dash; <a href="https://github.com/optimalisatie" target="_blank">Github</a> &dash; <a href="https://wordpress.org/support/plugin/above-the-fold-optimization" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
 	</div>
 <?php
 	} else {
 ?>
 	<div class="updated fade" style="position:relative;">
-		<p><em>Developed by:</em><br />Jan Jaap Hakvoort &dash; <a href="https://optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">https://optimalisatie.nl/</a> &dash; <a href="https://github.com/optimalisatie" target="_blank">Github</a> &dash; <a href="http://plugins.wordpress.org/above-the-fold-optimization/" target="_blank">Report bugs</a></p>
+		<p><em>Developed by:</em><br />Jan Jaap Hakvoort &dash; <a href="https://optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">https://optimalisatie.nl/</a> &dash; <a href="https://github.com/optimalisatie" target="_blank">Github</a> &dash; <a href="https://wordpress.org/support/plugin/above-the-fold-optimization" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
 	</div>
 <?php
 	}
@@ -151,7 +151,7 @@ class Abovethefold_Admin {
 
         		<h2>Critical Path CSS</h2>
         		<p>Generate Critical Path CSS for your main WordPress pages (e.g. the front page and blog page), combine and minify the resulting CSS and enter it into the field below. The critical path CSS is inserted inline into the <code>&lt;head&gt;</code> of the page and when <em>Optimize CSS Delivery</em> is enabled, all other CSS links are loaded asynchronously.</p>
-        		<p>A good Critical Path CSS generator is <a href="https://github.com/pocketjoso/penthouse" target="_blank">Penthouse</a> which is available online via <a href="http://jonassebastianohlsson.com/criticalpathcssgenerator/" target="_blank">this form</a> (many thanks to <a href="https://github.com/pocketjoso" target="_blank">Jonas Ohlsson</a> for making it freely available!).<br />
+        		<p>A good Critical Path CSS generator is <a href="https://github.com/pocketjoso/penthouse" target="_blank">Penthouse</a> which is available online via <a href="http://jonassebastianohlsson.com/criticalpathcssgenerator/" target="_blank">this form</a>.<br />
         		Other generators are <a href="https://github.com/addyosmani/critical" target="_blank">Critical</a> and <a href="https://github.com/filamentgroup/criticalcss" target="_blank">Critical CSS</a> which are available as Node.js and Grunt.js modules.</p>
         		<textarea style="width: 95%;height:250px;font-size:11px;" name="abovethefold_criticalcss"><?php echo htmlentities(get_option('abovethefold_criticalcss')); ?></textarea>
         		<br />

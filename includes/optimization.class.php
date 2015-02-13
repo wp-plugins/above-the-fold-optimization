@@ -75,10 +75,6 @@ class Abovethefold_Optimization {
 
 ?>
 <style type="text/css">
-/*!
- * Above the fold Optimization 0.1.0 (2015-02-11, 23:53)
- * By info@optimalisatie.nl / https://optimalisatie.nl/
- */
 <?php print get_option('abovethefold_criticalcss'); ?></style>
 <script type="text/javascript"><?php print file_get_contents(plugin_dir_path( dirname( __FILE__ ) ) . 'public/js/abovethefold.min.js'); ?> var CRITICALCSS;
 <?php if (is_admin() && intval(get_option('abovethefold_debug')) === 1) { print 'window.abovethefold.debug = true;'; } ?>
