@@ -16,12 +16,6 @@ This plugin enables to pass the "`Eliminate render-blocking JavaScript and CSS i
 
 ## Critical Path CSS generators
 
-#### Penthouse
-https://github.com/pocketjoso/penthouse
-http://jonassebastianohlsson.com/criticalpathcssgenerator/ (online)
+A good Critical Path CSS generator is [Penthouse](https://github.com/pocketjoso/penthouse) which is available online via [this form](http://jonassebastianohlsson.com/criticalpathcssgenerator/).
 
-#### Critical
-https://github.com/addyosmani/critical
-
-#### Critical CSS
-https://github.com/filamentgroup/criticalcss
+Other generators are [Critical](https://github.com/addyosmani/critical) and [Critical CSS](https://github.com/filamentgroup/criticalcss) which are available as Node.js and Grunt.js modules.
