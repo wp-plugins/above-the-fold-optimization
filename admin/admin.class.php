@@ -288,12 +288,20 @@ class Abovethefold_Admin {
 <h2 class="option_title"><?php _e('Above The Fold Optimization', 'abovethefold') ?></h2>
 <p>This plugin enables to pass the "<em>Eliminate render-blocking JavaScript and CSS in above-the-fold content</em>"-rule from <a href="https://developers.google.com/speed/pagespeed/insights/" target="_blank">Google PageSpeed Insights</a> to be able to obtain a 90+ score using other optimization plugins such as <a href="plugin-install.php?tab=search&s=w3+total+cache">W3 Total Cache</a>.</p>
 
-<div class="updated fade" style="position:relative;">
-	<p>Developed by <strong><a href="https://optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">Optimalisatie.nl</a></strong> - Website Optimization and Internationalisation
-	<br />Contribute via <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization" target="_blank">Github</a> &dash; <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization/issues" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
+<div class="wrap abovethefold-wrapper">
+	<div class="metabox-holder">
+		<div id="post-body-content" style="padding-bottom:0px;margin-bottom:0px;">
+			<div class="postbox">
+				<div class="inside" style="margin:0px;">
+					<p>Developed by <strong><a href="https://optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">Optimalisatie.nl</a></strong> - Website Optimization and Internationalisation
+					<br />Contribute via <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization" target="_blank">Github</a> &dash; <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization/issues" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
-<form method="post" action="<?php echo admin_url('admin-post.php?action=abovethefold_update'); ?>" class="clearfix">
+<form method="post" action="<?php echo admin_url('admin-post.php?action=abovethefold_update'); ?>" class="clearfix" style="margin-top:0px;">
 	<?php wp_nonce_field('abovethefold'); ?>
 	<div class="wrap abovethefold-wrapper">
 		<div id="poststuff">
