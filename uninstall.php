@@ -10,7 +10,7 @@
  * - Repeat with other user roles. Best directly by using the links/query string parameters.
  * - Repeat things for multisite. Once for a single site in the network, once sitewide.
  *
- * @link       https://optimalisatie.nl/#wordpress
+ * @link       https://optimalisatie.nl/
  * @since      1.0
  *
  * @package    abovethefold

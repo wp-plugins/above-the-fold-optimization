@@ -4,15 +4,15 @@
  *
  * This optimization plugin enables above the fold optimization based on the output of a critical path CSS generator and to pass the "Eliminate render-blocking JavaScript and CSS in above-the-fold content" rule from Google PageSpeed to obtain a high score.
  *
- * @link              https://optimalisatie.nl/#wordpress-optimalisatie
+ * @link              https://optimalisatie.nl/
  * @since             1.0
  * @package           abovethefold
  *
  * @wordpress-plugin
  * Plugin Name:       Above The Fold Optimization
- * Plugin URI:        https://optimalisatie.nl/#wordpress
+ * Plugin URI:        https://optimalisatie.nl/
  * Description:       Above the fold optimization based on the output of a critical path CSS generator to pass the "<em>Eliminate render-blocking JavaScript and CSS in above-the-fold content</em>" rule from Google PageSpeed.
- * Version:           1.0
+ * Version:           2.0
  * Author:            Optimalisatie.nl
  * Author URI:        https://optimalisatie.nl/
  * Text Domain:       abovethefold

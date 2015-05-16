@@ -17,16 +17,16 @@ class Abovethefold {
 	 * the plugin.
 	 *
 	 * @since    1.0
-	 * @access   protected
+	 * @access   public
 	 * @var      Abovethefold_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
-	protected $loader;
+	public $loader;
 
 	/**
 	 * The unique identifier of this plugin.
 	 *
 	 * @since    1.0
-	 * @access   protected
+	 * @access   public
 	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
 	 */
 	public $plugin_name;
@@ -44,19 +44,37 @@ class Abovethefold {
 	 * Development environment
 	 *
 	 * @since    1.0
-	 * @access   protected
+	 * @access   public
 	 * @var      bool    Loaded via development / testing environment.
 	 */
-	public $devenv = false;
+	public $debug = false;
 
 	/**
-	 * Disable abovethefold (public testing)
+	 * Disable abovethefold (testing)
 	 *
 	 * @since    1.0
-	 * @access   protected
+	 * @access   public
 	 * @var      bool
 	 */
 	public $noop = false;
+
+	/**
+	 * Extract CSS JSON for Critical Path CSS generator.
+	 *
+	 * @since    2.0
+	 * @access   public
+	 * @var      bool
+	 */
+	public $extractcss = false;
+
+	/**
+	 * Options
+	 *
+	 * @since    2.0
+	 * @access   public
+	 * @var      array
+	 */
+	public $options;
 
 	/**
 	 * Construct and initiated Abovethefold class.
@@ -66,7 +84,7 @@ class Abovethefold {
 	public function __construct() {
 
 		$this->plugin_name = 'abovethefold';
-		$this->version = '1.0';
+		$this->version = '2.0';
 
 		/**
 		 * Disable plugin in admin or for testing
@@ -89,7 +107,14 @@ class Abovethefold {
 		$this->set_locale();
 		$this->define_admin_hooks();
 
-		if ( !is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
+		$this->options = get_option( 'abovethefold' );
+
+		/**
+		 * Verify hash to prevent extracting data outside the plugin
+		 */
+		$this->extractcss = (isset($_REQUEST['extract-css']) && $_REQUEST['extract-css'] === md5(SECURE_AUTH_KEY . AUTH_KEY)) ? true : false;
+
+		if ( !$this->noop ) {
 			$this->define_optimization_hooks();
 		}
 
@@ -100,13 +125,12 @@ class Abovethefold {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - Optimization_Loader. Orchestrates the hooks of the plugin.
-	 * - Optimization_i18n. Defines internationalization functionality.
-	 * - Optimization_Admin. Defines all hooks for the dashboard.
-	 * - Optimization_Public. Defines all hooks for the public side of the site.
+	 * - Loader. Orchestrates the hooks of the plugin.
+	 * - i18n. Defines internationalization functionality.
+	 * - Admin. Defines all hooks for the dashboard.
+	 * - Optimization. Defines optimization functionality.
 	 *
-	 * Create an instance of the loader which will be used to register the hooks
-	 * with WordPress.
+	 * Create an instance of the loader which will be used to register the hooks with WordPress.
 	 *
 	 * @since    1.0
 	 * @access   private
@@ -166,12 +190,10 @@ class Abovethefold {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Abovethefold_Admin( $this->get_plugin_name(), $this->get_version(), $this->config );
+		$plugin_admin = new Abovethefold_Admin( $this );
 
-		if (is_admin()) {
-			// Hook in the admin options page
-        	$this->loader->add_action('admin_menu', $plugin_admin, 'admin_menu',1);
-		}
+		// Hook in the admin options page
+		$this->loader->add_action('admin_menu', $plugin_admin, 'admin_menu',30);
 
 		// Register settings (data storage)
 		$this->loader->add_action('admin_init', $plugin_admin, 'register_settings');
@@ -188,11 +210,21 @@ class Abovethefold {
 
 		$plugin_optimization = new Abovethefold_Optimization( $this );
 
-		$this->loader->add_action('init', $plugin_optimization, 'init');
+		$this->loader->add_action('init', $plugin_optimization, 'start_buffering',99999);
 		$this->loader->add_action('wp_head', $plugin_optimization, 'header', 1);
-		$this->loader->add_action('wp_foot', $plugin_optimization, 'bufferend', 99999);
+		//$this->loader->add_action('wp_foot', $plugin_optimization, 'bufferend', 99999);
 
 		$this->loader->add_action('wp_print_footer_scripts', $plugin_optimization, 'footer',99999);
+
+		/**
+		 * Autoptimize: skip Critical Path CSS
+		 */
+		$this->loader->add_filter( 'autoptimize_filter_css_exclude', $plugin_optimization, 'autoptimize_skip_css' );
+
+		/**
+		 * Autoptimize: skip Critical Path Javascript
+		 */
+		$this->loader->add_filter( 'autoptimize_filter_js_exclude', $plugin_optimization, 'autoptimize_skip_js' );
 
 	}
 
@@ -237,12 +269,53 @@ class Abovethefold {
 	}
 
 	/**
+	 * Cache path
+	 */
+	public function cache_path() {
+		$dir = wp_upload_dir();
+		$path = $dir['basedir'] . '/abovethefold/';
+		if (!is_dir($path)) {
+			mkdir($path,0775);
+		}
+		return apply_filters('abovethefold_cache_path', $path);
+	}
+
+	/**
+	 * Cache URL
+	 */
+	public function cache_dir() {
+		$dir = wp_upload_dir();
+		$path = $dir['baseurl'] . '/abovethefold/';
+		return apply_filters('abovethefold_cache_dir', $path);
+	}
+
+	/**
 	 * Fired during plugin activation.
 	 *
 	 * @since     1.0
 	 * @return    string    The version number of the plugin.
 	 */
 	public function activate() {
+
+		/**
+		 * Curl
+		 */
+		if (function_exists('curl_version') || ini_get('allow_url_fopen')) {
+			trigger_error('PHP lib Curl should be installed or <em>allow_url_fopen</em> should be enabled.',E_USER_ERROR);
+		}
+
+		/**
+		 * Set default options
+		 */
+		$default_options = array( );
+		$default_options['debug'] = true;
+		$default_options['optimize_css_delivery'] = true;
+		$default_options['dimensions'] = '1600x1200, 720x1280, 320x480';
+
+		$options = get_option( 'abovethefold' );
+		if ( empty( $options ) ) {
+			update_option( "abovethefold", $default_options );
+		}
 
 	}
 
@@ -253,6 +326,11 @@ class Abovethefold {
 	 * @return    string    The version number of the plugin.
 	 */
 	public function deactivate() {
+
+		/**
+		 * Remove options
+		 */
+		delete_option( 'abovethefold' );
 
 	}
 

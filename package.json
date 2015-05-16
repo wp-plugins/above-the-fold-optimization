@@ -1,6 +1,6 @@
 {
   "name": "abovethefold",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "description": "Above the fold Optimization",
   "author": {
     "name": "info@optimalisatie.nl",
@@ -10,11 +10,11 @@
   "engines": {
     "node": "~0.10"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "grunt": "latest",
     "grunt-contrib-uglify": "latest",
-    "matchdep": "latest"
+    "matchdep": "latest",
+    "penthouse": "latest"
   }
 }

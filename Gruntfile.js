@@ -5,11 +5,11 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		meta: {
-			banner:
-				'/*!\n' +
-				' * Above the fold Optimization <%= pkg.version %> (<%= grunt.template.today("yyyy-mm-dd") %>)\n' +
-				' * @link https://plugins.wordpress.org/above-the-fold-optimization/\n' +
-				' */'
+			banner: ''
+				//'/*!\n' +
+				//' * Above the fold Optimization <%= pkg.version %>\n' +
+				//' * @author info@optimalisatie.nl\n' +
+				//' */'
 		},
 
 		uglify: {
