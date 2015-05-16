@@ -12,7 +12,7 @@ This plugin enables to pass the "Eliminate render-blocking JavaScript and CSS in
 
 == Description ==
 
-This plugin enables to pass the "`Eliminate render-blocking JavaScript and CSS in above-the-fold content`"-rule from [Google PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/) to be able to obtain a high PageSpeed score using other optimization plugins such as [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/).
+This plugin enables to pass the "`Eliminate render-blocking JavaScript and CSS in above-the-fold content`"-rule from [Google PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/) to be able to obtain a high PageSpeed score using other optimization plugins such as [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/), [WP Super Cache](https://wordpress.org/plugins/wp-super-cache/) or [Autoptimize](https://wordpress.org/plugins/autoptimize/).
 
 The functionality of this plugin is simple and light-weight. The plugin inserts Critical Path CSS code inline, helps to create it and optionally optimizes the delivery of the full website CSS.
 
