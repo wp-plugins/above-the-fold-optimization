@@ -213,7 +213,7 @@ class Abovethefold_Admin {
 		if (isset($_REQUEST['generate_cli'])) {
 			$CLI = $this->generator->generate(true);
 			$this->set_notice('Use the following command to generate Critical Path CSS.<br />
-			<strong><font color="red">Warning:</font></strong> Aldough the author of this plugin has the best intentions, be very carefull when entering commands via SSH.
+			<strong><font color="red">Warning:</font></strong> Although the author of this plugin has the best intentions, be very careful when entering commands via SSH.
 			<hr /><textarea style="width:100%;height:400px;">'.$CLI.'</textarea>');
 		} else {
 
