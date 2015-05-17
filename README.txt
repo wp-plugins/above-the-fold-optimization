@@ -41,9 +41,9 @@ To make use of automated Critical Path CSS generation it is required to install 
 1. [PhantomJS](http://phantomjs.org/): ``npm install -g phantomjs``
 2. [Clean-CSS](https://github.com/jakubpawlowicz/clean-css): ``npm install -g clean-css``
 
-To be able to generate Critical Path CSS from within the WordPress admin both software need to be executable from PHP which may pose a security risk. An alternative option is to generate a CLI command to execute via SSH so that the software does not need to be executeable from PHP.
+To be able to generate Critical Path CSS from within the WordPress admin the software needs to be executable from PHP which may pose a security risk. An alternative option is to generate a CLI command to execute via SSH so that the software does not need to be executable from PHP.
 
-Next install the WordPress plugin.
+### WordPress plugin installation
 
 1. Upload the `above-the-fold-optimization/` directory to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
