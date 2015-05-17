@@ -18,6 +18,14 @@ The functionality of this plugin is simple and light-weight. The plugin simply i
 
 The plugin is intended to work together with other optimization plugins such as [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/), [WP Super Cache](https://wordpress.org/plugins/wp-super-cache/) and [Autoptimize](https://wordpress.org/plugins/autoptimize/).
 
+Using just 3 plugins it is possible to achieve a PageSpeed 100-score. The following demo is an original WordPress blog ``v4.2.2`` with the default theme, [Autoptimize](https://wordpress.org/plugins/autoptimize/) javascript and CSS optimization, [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/) for full-page cache and the Above The Fold Optimization plugin.
+
+https://abovethefold.optimalisatie.nl/
+
+https://developers.google.com/speed/pagespeed/insights/?url=https%3A%2F%2Fabovethefold.optimalisatie.nl%2F&tab=mobile
+
+### Automated Critical Path CSS generation
+
 The plugin enables automated Critical Path CSS generation via [Penthouse.js](https://github.com/pocketjoso/penthouse). The plugin will execute Penthouse.js to generate Critical Path CSS for multiple responsive dimensions and pages, combines the resulting CSS-code and then compresses the CSS-code via [Clean-CSS](https://github.com/jakubpawlowicz/clean-css) to achieve the smallest CSS-code to insert inline into the ``<head>`` of the page.
 
 If custom installation of software is not possible on the server it is possible to use the online Critical Path CSS generator based on Penthouse.js on the following address:
@@ -25,13 +33,6 @@ If custom installation of software is not possible on the server it is possible 
 http://jonassebastianohlsson.com/criticalpathcssgenerator/
 
 Other Critical Path CSS generators are [Critical](https://github.com/addyosmani/critical) and [Critical CSS](https://github.com/filamentgroup/criticalcss) which are available as Node.js and Grunt.js modules.
-
-### Demo
-The following demo is an original WordPress blog ``v4.2.2`` with the default theme, [Autoptimize](https://wordpress.org/plugins/autoptimize/) javascript and CSS optimization, [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/) for full-page cache and the Above The Fold Optimization plugin. Using just these 3 plugins it is possible to achieve a PageSpeed 100-score.
-
-https://abovethefold.optimalisatie.nl/
-
-https://developers.google.com/speed/pagespeed/insights/?url=https%3A%2F%2Fabovethefold.optimalisatie.nl%2F&tab=mobile
 
 == Installation ==
 
