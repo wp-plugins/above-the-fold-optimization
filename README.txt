@@ -18,7 +18,7 @@ The functionality of this plugin is simple and light-weight. The plugin simply i
 
 The plugin is intended to work together with other optimization plugins such as [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/), [WP Super Cache](https://wordpress.org/plugins/wp-super-cache/) and [Autoptimize](https://wordpress.org/plugins/autoptimize/).
 
-Using just 3 plugins it is possible to achieve a PageSpeed 100-score. The following demo is an original WordPress blog ``v4.2.2`` with the default theme, [Autoptimize](https://wordpress.org/plugins/autoptimize/) javascript and CSS optimization, [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/) for full-page cache and the Above The Fold Optimization plugin.
+Using just 3 plugins and default settings it is possible to achieve a PageSpeed 100-score. The following demo is an original WordPress blog ``v4.2.2`` with the default theme, [Autoptimize](https://wordpress.org/plugins/autoptimize/) javascript and CSS optimization, [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/) for full-page cache and the Above The Fold Optimization plugin.
 
 https://abovethefold.optimalisatie.nl/
 
