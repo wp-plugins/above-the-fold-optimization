@@ -8,17 +8,17 @@ Stable tag: 4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin enables to pass the "Eliminate render-blocking JavaScript and CSS in above-the-fold content"-rule from Google PageSpeed Insights.
+This plugin enables to pass the "Eliminate render-blocking JavaScript and CSS in above-the-fold content"-rule from Google PageSpeed Insights to be able to obtain a high PageSpeed score using other optimization plugins such as W3 Total Cache.
 
 == Description ==
 
-This plugin enables to pass the "`Eliminate render-blocking JavaScript and CSS in above-the-fold content`"-rule from [Google PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/) to be able to obtain a high PageSpeed score using other optimization plugins such as [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/), [WP Super Cache](https://wordpress.org/plugins/wp-super-cache/) or [Autoptimize](https://wordpress.org/plugins/autoptimize/).
+This plugin enables to pass the "`Eliminate render-blocking JavaScript and CSS in above-the-fold content`"-rule from [Google PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/).
 
-The functionality of this plugin is simple and light-weight. The plugin inserts Critical Path CSS code inline, helps to create it and optionally optimizes the delivery of the full website CSS.
+The functionality of this plugin is simple and light-weight. The plugin simply inserts Critical Path CSS code inline, helps to create it and optionally optimizes the delivery of the full website CSS.
+
+The plugin is intended to work together with other optimization plugins such as [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/), [WP Super Cache](https://wordpress.org/plugins/wp-super-cache/) and [Autoptimize](https://wordpress.org/plugins/autoptimize/).
 
 The plugin enables automated Critical Path CSS generation via [Penthouse.js](https://github.com/pocketjoso/penthouse). The plugin will execute Penthouse.js to generate Critical Path CSS for multiple responsive dimensions and pages, combines the resulting CSS-code and then compresses the CSS-code via [Clean-CSS](https://github.com/jakubpawlowicz/clean-css) to achieve the smallest CSS-code to insert inline into the ``<head>`` of the page.
-
-Penthouse.js requires [PhantomJS](http://phantomjs.org/) to be installed on the server.
 
 If custom installation of software is not possible on the server it is possible to use the online Critical Path CSS generator based on Penthouse.js on the following address:
 
@@ -26,16 +26,23 @@ http://jonassebastianohlsson.com/criticalpathcssgenerator/
 
 Other Critical Path CSS generators are [Critical](https://github.com/addyosmani/critical) and [Critical CSS](https://github.com/filamentgroup/criticalcss) which are available as Node.js and Grunt.js modules.
 
+### Demo
+The following demo is an original WordPress blog ``v4.2.2`` with the default theme, [Autoptimize](https://wordpress.org/plugins/autoptimize/) javascript and CSS optimization, [W3 Total Cache](https://wordpress.org/plugins/w3-total-cache/) for full-page cache and the Above The Fold Optimization plugin. Using just these 3 plugins it is possible to achieve a PageSpeed 100-score.
+
+https://abovethefold.optimalisatie.nl/
+
+https://developers.google.com/speed/pagespeed/insights/?url=https%3A%2F%2Fabovethefold.optimalisatie.nl%2F&tab=mobile
+
 == Installation ==
 
-To make use of the automated Critical Path CSS generator it is required to install the following software on the server:
+To make use of automated Critical Path CSS generation it is required to install the following software on the server:
 
 1. [PhantomJS](http://phantomjs.org/): ``npm install -g phantomjs``
 2. [Clean-CSS](https://github.com/jakubpawlowicz/clean-css): ``npm install -g clean-css``
 
-To be able to generate Critical Path CSS from within the WordPress admin the software needs to be executable from PHP which may pose a security risk. An alternative option is to generate a CLI command to execute via SSH so that the software does not need to be executable from PHP.
+To be able to generate Critical Path CSS from within the WordPress admin both software need to be executable from PHP which may pose a security risk. An alternative option is to generate a CLI command to execute via SSH so that the software does not need to be executeable from PHP.
 
-### WordPress plugin installation
+Next install the WordPress plugin.
 
 1. Upload the `above-the-fold-optimization/` directory to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
