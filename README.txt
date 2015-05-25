@@ -57,6 +57,9 @@ To be able to generate Critical Path CSS from within the WordPress admin the sof
 
 == Changelog ==
 
+= 2.1 =
+* Small fixes.
+
 = 2.0 =
 * Automated Critical Path CSS generation via [Penthouse.js](https://github.com/pocketjoso/penthouse).
 * Automated inline CSS optimization via [Clean-CSS](https://github.com/jakubpawlowicz/clean-css).
