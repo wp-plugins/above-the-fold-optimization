@@ -295,7 +295,7 @@ class Abovethefold_Admin {
 		<div id="post-body-content" style="padding-bottom:0px;margin-bottom:0px;">
 			<div class="postbox">
 				<div class="inside" style="margin:0px;">
-					<p>Developed by <strong><a href="https://optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">Optimalisatie.nl</a></strong> - Website Optimization and Internationalisation
+					<p>Developed by <strong><a href="https://en.optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">Optimalisatie.nl</a></strong> - Website Optimization and Internationalisation
 					<br />Contribute via <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization" target="_blank">Github</a> &dash; <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization/issues" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
 				</div>
 			</div>
@@ -384,7 +384,7 @@ class Abovethefold_Admin {
 								<strong style="font-style:normal;">Automated CSS generation</strong>
 								<br />
 								Automated generation requires <a href="https://github.com/ariya/phantomjs" target="_blank">PhantomJS</a> to be installed on the server and executable by PHP. <strong><font color="red">This can be a security risk.</font></strong>
-								<br />It also requires <a href="https://github.com/jakubpawlowicz/clean-css" target="_blank">Clean-CSS</a> to be installed on the server and executeable by PHP.
+								<br />It also requires <a href="https://github.com/jakubpawlowicz/clean-css" target="_blank">Clean-CSS</a> to be installed on the server and executable by PHP.
 								<p>As an alternative to automated generation you can select the option <a href="javascript:void(0);" class="button button-small">Generate CLI command</a> which will result in a command-line string that can be executed via SSH. The resulting CSS code can then be copied into the <a href="#criticalcss">Criticial CSS field</a>.</p>
 							</blockquote>
 
@@ -451,26 +451,7 @@ class Abovethefold_Admin {
 	</div> <!-- End of .wrap .nginx-wrapper -->
 </form>
 <?php
-		if (isset($_REQUEST['hideadd']) && intval($_REQUEST['hideadd']) === 1) {
-			update_option('abovethefold_hidead', 1);
-		}
-/*
-		if (intval(get_option('abovethefold_hidead')) !== 1) {
-?>
-	<div class="updated fade" style="position:relative;">
-		<img src="/wp-content/plugins/abovethefold/admin/google-pagespeed-100.png" style="float:right; margin-top:10px;">
-		<p style="font-size:16px;">Need help obtaining a Google PageSpeed 100-score for mobile and desktop?<br />Contact me at <a href="mailto:info@optimalisatie.nl?subject=Above%20the%20fold">info@optimalisatie.nl</a> for paid optimization service.</p>
-		<p style="position:absolute;bottom:0px;right:10px;"><a href="admin.php?page=abovethefold&amp;hideadd=1" class="button">hide this message</a></p>
-        <p>Jan Jaap Hakvoort &dash; <a href="https://optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">https://optimalisatie.nl/</a> &dash; <a href="https://github.com/optimalisatie" target="_blank">Github</a> &dash; <a href="https://wordpress.org/support/plugin/above-the-fold-optimization" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
-	</div>
-<?php
-		} else {
-?>
-	<div class="updated fade" style="position:relative;">
-		<p><em>Developed by:</em><br />Jan Jaap Hakvoort &dash; <a href="https://optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">https://optimalisatie.nl/</a> &dash; <a href="https://github.com/optimalisatie" target="_blank">Github</a> &dash; <a href="https://wordpress.org/support/plugin/above-the-fold-optimization" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
-	</div>
-<?php
-		}*/
+
 	}
 
 	/**

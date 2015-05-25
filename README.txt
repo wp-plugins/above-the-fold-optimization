@@ -1,6 +1,6 @@
 === Above The Fold Optimization ===
 Contributors: optimalisatie
-Donate link: https://optimalisatie.nl/
+Donate link: https://en.optimalisatie.nl/
 Tags: optimization, above the fold, critical path, css
 Requires at least: 3.0.1
 Tested up to: 4.2.2

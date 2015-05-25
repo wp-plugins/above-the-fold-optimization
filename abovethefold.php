@@ -10,11 +10,11 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Above The Fold Optimization
- * Plugin URI:        https://optimalisatie.nl/
+ * Plugin URI:        https://en.optimalisatie.nl/
  * Description:       Above the fold optimization based on the output of a critical path CSS generator to pass the "<em>Eliminate render-blocking JavaScript and CSS in above-the-fold content</em>" rule from Google PageSpeed.
- * Version:           2.0
+ * Version:           2.1
  * Author:            Optimalisatie.nl
- * Author URI:        https://optimalisatie.nl/
+ * Author URI:        https://en.optimalisatie.nl/
  * Text Domain:       abovethefold
  * Domain Path:       /languages
  */
