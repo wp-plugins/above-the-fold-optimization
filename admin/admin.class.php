@@ -191,7 +191,6 @@ class Abovethefold_Admin {
 		} else {
 			$options['urls'] = implode("\n",$urls);
 		}
-		$urls = implode($options['urls']);
 
 		update_option('abovethefold',$options);
 
