@@ -57,6 +57,9 @@ To be able to generate Critical Path CSS from within the WordPress admin the sof
 
 == Changelog ==
 
+= 2.1.1 =
+* Addslashes bug.
+
 = 2.1 =
 * Small fixes.
 

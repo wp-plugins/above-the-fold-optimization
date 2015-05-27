@@ -113,6 +113,13 @@ class Abovethefold_Admin {
 	public function update_settings() {
 		check_admin_referer('abovethefold');
 
+		if ( get_magic_quotes_gpc() ) {
+			$_POST = array_map( 'stripslashes_deep', $_POST );
+			$_GET = array_map( 'stripslashes_deep', $_GET );
+			$_COOKIE = array_map( 'stripslashes_deep', $_COOKIE );
+			$_REQUEST = array_map( 'stripslashes_deep', $_REQUEST );
+		}
+
 		$options = get_option('abovethefold');
 		if (!is_array($options)) {
 			$options = array();
@@ -127,7 +134,7 @@ class Abovethefold_Admin {
 		$options['cssdelivery_ignore'] = trim(sanitize_text_field($input['cssdelivery_ignore']));
 		$options['debug'] = (isset($input['debug']) && intval($input['debug']) === 1) ? true : false;
 
-		$css = trim(sanitize_text_field($input['css']));
+		$css = trim(sanitize_text_field(stripslashes($input['css'])));
 
 		$cssfile = $this->CTRL->cache_path() . 'inline.min.css';
 		file_put_contents($cssfile,$css);
@@ -146,6 +153,13 @@ class Abovethefold_Admin {
 		$options = get_site_option('abovethefold');
 		if (!is_array($options)) {
 			$options = array();
+		}
+
+		if ( get_magic_quotes_gpc() ) {
+			$_POST = array_map( 'stripslashes_deep', $_POST );
+			$_GET = array_map( 'stripslashes_deep', $_GET );
+			$_COOKIE = array_map( 'stripslashes_deep', $_COOKIE );
+			$_REQUEST = array_map( 'stripslashes_deep', $_REQUEST );
 		}
 
 		$input = $_POST['abovethefold'];
