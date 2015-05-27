@@ -61,7 +61,7 @@ To be able to generate Critical Path CSS from within the WordPress admin the sof
 * Addslashes bug.
 
 = 2.1 =
-* Small fixes.
+* Small improvements.
 
 = 2.0 =
 * Automated Critical Path CSS generation via [Penthouse.js](https://github.com/pocketjoso/penthouse).
