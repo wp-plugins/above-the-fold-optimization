@@ -308,4 +308,101 @@ class Abovethefold_Generator_Penthouse {
 
 	}
 
+	/**
+	 * Extract Full CSS
+	 *
+	 * @since    2.0
+	 * @var      string    $code       The javascript string to minify
+	 */
+	public function extract_fullcss( $return_cli = false ) {
+
+		if (!$this->curl) {
+			return '';
+		}
+
+		$cli = array();
+
+		$siteurl = get_option('siteurl');
+
+		$urlarr = explode("\n",$this->options['genurls']);
+
+		// Temp files to be deleted upon completion
+		$tmpfiles = array();
+
+		$urls = array();
+		foreach ($urlarr as $url) {
+			if (trim($url) === '') {
+				continue 1;
+			}
+			$urls[] = $siteurl . trim($url);
+		}
+
+		if (empty($urls)) {
+			$this->CTRL->set_notice('No URL\'s configured for Critical CSS generation.','error');
+			return '';
+		}
+
+		$GLOBALS['extracthash'] = md5(SECURE_AUTH_KEY . AUTH_KEY);
+
+		function append_css_querystring($url) {
+			if (!preg_match('|^http(s)?://|Ui',$url)) {
+				return false;
+			}
+			$original = $url;
+			if (strpos($url,'?') !== false) {
+				$url .= '&';
+			} else {
+				$url .= '?';
+			}
+			$url .= http_build_query(array(
+				'extract-css' => $GLOBALS['extracthash']
+			));
+			return array($original,$url);
+		}
+		$parsed_urls = array_map('append_css_querystring',$urls);
+
+		$urls = array();
+		foreach($parsed_urls as $url) {
+			if (!$url) { continue 1; }
+			$urls[] = $url;
+		}
+
+		if (empty($urls)) {
+			$this->CTRL->set_notice('No URL\'s configured for Critical CSS generation.','error');
+			return '';
+		}
+
+		$fullCSS = '';
+
+		$errors = array();
+
+		foreach ($urls as $url) {
+
+			if ($this->curl === 'file_get_contents') {
+				$data = file_get_contents($url[1]);
+			} else {
+				$data = $this->curl->get($url[1]);
+			}
+
+			/**
+			 * Verify security hash (to prevent extracting data outside the plugin)
+			 */
+			if (!$data || !preg_match('|EXTRACT-CSS-'.preg_quote($GLOBALS['extracthash']).'|Ui',$data)) {
+				$this->CTRL->set_notice('Failed to extract JSON for URL '.$url[0].'. Is the URL located and reachable on the live WordPress installation?','error');
+				return;
+			}
+			$data = trim(preg_replace('|EXTRACT-CSS-([a-z0-9]{32})|Ui','',$data));
+			$data = @json_decode($data,true);
+			if (!is_array($data) || !isset($data['css'])) {
+				$this->CTRL->set_notice('Extracted CSS for URL '.$url[0].' returned an invalid response. Please contact the administrator of the plugin.','error');
+				return;
+			}
+
+			$fullCSS .= $data['css'];
+
+		}
+
+		return $fullCSS;
+
+	}
 }

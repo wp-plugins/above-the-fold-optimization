@@ -90,7 +90,7 @@ class Abovethefold_Optimization {
 			return $buffer;
 		}
 
-		$rows = preg_split('|\n|Ui',$this->CTRL->options['cssdelivery_ignore']);
+		$rows = preg_split('#[\n|\s|,]#Ui',$this->CTRL->options['cssdelivery_ignore']);
 		$ignorelist = array();
 		foreach ($rows as $row) {
 			if (trim($row) === '') {
@@ -101,6 +101,9 @@ class Abovethefold_Optimization {
 
 		$search = array();
 		$replace = array();
+
+		$search[] = '|(jQuery\(function\(\) \{\s+mdf_init_search_form[^\}]+\}\)\;)|is';
+		$replace[] = 'head.ready(function() { $1 });';
 
 		/**
 		 * Parse CSS links
@@ -180,6 +183,8 @@ class Abovethefold_Optimization {
 
 		$csscode = array();
 
+		$cssfiles = array();
+
 		$remove = array();
 		foreach ($stylesheets as $sheet) {
 
@@ -249,7 +254,17 @@ class Abovethefold_Optimization {
 					$path = (substr(ABSPATH,-1) === '/') ? substr(ABSPATH,0,-1) : ABSPATH;
 					$path .= preg_replace('|^(http(s)?:)?//[^/]+/|','/',$src);
 
-					$csscode[] = array($media,file_get_contents($path));
+					$css = file_get_contents($path);
+
+					$csscode[] = array($media,$css);
+				}
+
+				if (isset($_REQUEST['output']) && strtolower($_REQUEST['output']) === 'print') {
+					$cssfiles[] = array(
+						'src' => $url,
+						'code' => $css,
+						'media' => $media
+					);
 				}
 			}
 
@@ -282,6 +297,18 @@ class Abovethefold_Optimization {
 			$code = preg_replace('#.*<!\[CDATA\[(?:\s*\*/)?(.*)(?://|/\*)\s*?\]\]>.*#sm','$1',$code);
 			$csscode[] = array($media,$code);
 
+            if (isset($_REQUEST['output']) && strtolower($_REQUEST['output']) === 'print') {
+				$xdoc = new DOMDocument();
+				$xdoc->appendChild($xdoc->importNode($style, true));
+
+				$cssfiles[] = array(
+					'src' => md5($code),
+					'inline' => true,
+					'code' => $xdoc->saveHTML(),
+					'media' => $media
+				);
+			}
+
 			// Remove script from DOM
 			$remove[] = $style;
 		}
@@ -305,6 +332,102 @@ class Abovethefold_Optimization {
 			'css' => $inlineCSS,
 			'html' => $HTML
 		));
+
+		$url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
+
+		$parsed = [];
+		parse_str(substr($url, strpos($url, '?') + 1), $parsed);
+		$extractkey = $parsed['extract-css'];
+		unset($parsed['extract-css']);
+		unset($parsed['output']);
+		$url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'].'/';
+		if(!empty($parsed))
+		{
+			$url .= '?' . http_build_query($parsed);
+		}
+
+		if (isset($_REQUEST['output']) && (
+			strtolower($_REQUEST['output']) === 'css'
+			|| strtolower($_REQUEST['output']) === 'download'
+		)) {
+
+			if (strtolower($_REQUEST['output']) === 'download') {
+				header('Content-type: text/css');
+				header('Content-disposition: attachment; filename="full-css-'.$extractkey.'.css"');
+			}
+
+			return $inlineCSS;
+		} else if (isset($_REQUEST['output']) && strtolower($_REQUEST['output']) === 'print') {
+
+function human_filesize($bytes, $decimals = 2) {
+    $size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
+    $factor = floor((strlen($bytes) - 1) / 3);
+    return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$size[$factor];
+}
+
+			$cssoutput = '<html>
+<head>
+<title>Full CSS extraction</title>
+<script type="text/javascript">
+function show_inline(id) {
+	var w = window.open();
+	w.document.open(\'about:blank\',\'cssdisplay\');
+	w.document.write(document.getElementById(id).value);
+	w.document.close();
+}
+</script>
+</head>
+<body>
+
+<h1>Full CSS Extraction</h1>
+
+<div>Url: <a href="'.$url.'" target="_blank">'.$url.'</a></div>
+<br />
+';
+
+			foreach($cssfiles as $file) {
+
+				if ($file['inline']) {
+					$cssoutput .= '<textarea style="display:none;" id="inline'.$file['src'].'">'.htmlentities(htmlentities($file['code'])).'</textarea>
+					<div>
+						Inline <a href="javascript:void(0);" onclick="show_inline(\'inline'.$file['src'].'\');">'.$file['src'].'</a> ('.human_filesize(strlen($file['code']), 2).') - Media: '.implode(', ',$file['media']).'
+					</div>';
+				} else {
+					$cssoutput .= '<div>
+						<a href="'.$file['src'].'" target="_blank">'.$file['src'].'</a> ('.human_filesize(strlen($file['code']), 2).') - Media: '.implode(', ',$file['media']).'
+					</div>';
+				}
+
+			}
+
+
+$cssoutput .= '
+
+<br />
+<fieldset>
+<legend>Full CSS</legend>
+<textarea style="width:100%;height:300px;">
+'.htmlentities($inlineCSS).'
+</textarea>
+
+	<div style="padding:10px;text-align:center;">
+		<a href="'.$url.'?extract-css='.$extractkey.'&amp;output=download">Download</a>
+	</div>
+
+</fieldset>
+
+<div style="font-size:20px;padding:10px;">
+	<a href="http://csscompressor.com/" target="_blank">CSS Minify</a> |
+	<a href="http://jonassebastianohlsson.com/criticalpathcssgenerator/" target="_blank">Critical Path CSS Generator</a>
+</div>
+
+
+</body>
+</html>';
+
+			return $cssoutput;
+		}
 
 		return $output;
 	}

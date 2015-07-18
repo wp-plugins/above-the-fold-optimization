@@ -24,11 +24,13 @@ https://abovethefold.optimalisatie.nl/
 
 https://developers.google.com/speed/pagespeed/insights/?url=https%3A%2F%2Fabovethefold.optimalisatie.nl%2F&tab=mobile
 
+Note: `This plugin is intended to achieve the best possible result, not easy usage. It is intended for advanced WordPress users and optimization professionals.`
+
 ### Automated Critical Path CSS generation
 
-The plugin enables automated Critical Path CSS generation via [Penthouse.js](https://github.com/pocketjoso/penthouse). The plugin will execute Penthouse.js to generate Critical Path CSS for multiple responsive dimensions and pages, combines the resulting CSS-code and then compresses the CSS-code via [Clean-CSS](https://github.com/jakubpawlowicz/clean-css) to achieve the smallest CSS-code to insert inline into the ``<head>`` of the page.
+The plugin enables automated Critical Path CSS generation via [Penthouse.js](https://github.com/pocketjoso/penthouse). The plugin will execute Penthouse.js to generate Critical Path CSS for multiple responsive dimensions and pages, combines the resulting CSS-code and then compresses the CSS-code via [Clean-CSS](https://github.com/jakubpawlowicz/clean-css).
 
-If custom installation of software is not possible on the server it is possible to use the online Critical Path CSS generator based on Penthouse.js on the following address:
+If custom installation of software is not possible on the server it is possible to use an online Critical Path CSS generator based on Penthouse.js on the following address:
 
 http://jonassebastianohlsson.com/criticalpathcssgenerator/
 
@@ -41,7 +43,7 @@ To make use of automated Critical Path CSS generation it is required to install 
 1. [PhantomJS](http://phantomjs.org/): ``npm install -g phantomjs``
 2. [Clean-CSS](https://github.com/jakubpawlowicz/clean-css): ``npm install -g clean-css``
 
-To be able to generate Critical Path CSS from within the WordPress admin the software needs to be executable from PHP which may pose a security risk. An alternative option is to generate a CLI command to execute via SSH so that the software does not need to be executable from PHP.
+To be able to generate Critical Path CSS from within the WordPress admin the software needs to be executable from PHP which may pose a security risk. An alternative option is to generate a CLI command to execute via SSH.
 
 ### WordPress plugin installation
 
@@ -56,6 +58,11 @@ To be able to generate Critical Path CSS from within the WordPress admin the sof
 2. Inline CSS configuration and optimization.
 
 == Changelog ==
+
+= 2.2 =
+* Improved admin
+* Online generator instructions
+* Full CSS extraction
 
 = 2.1.1 =
 * Addslashes bug.

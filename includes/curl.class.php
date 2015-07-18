@@ -52,7 +52,7 @@ class Abovethefold_Curl {
 	/**
 	 * Get content from HTTP request
 	 */
-	public function get($url,$referer=false,$post=null,$ua=false,$timeout=false,$use_get=false,$followlocation=0,$httpheaders = false,$encoding = false) {
+	public function get($url,$referer=false,$post=null,$ua=false,$timeout=false,$use_get=false,$followlocation=1,$httpheaders = false,$encoding = false) {
 		if (!$timeout) {
 			$timeout = 15;
 		}

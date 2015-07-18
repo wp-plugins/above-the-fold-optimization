@@ -47,6 +47,7 @@ class Abovethefold_Admin {
 
 		$this->CTRL->loader->add_action('admin_post_abovethefold_update', $this,  'update_settings');
 		$this->CTRL->loader->add_action('admin_post_abovethefold_generate', $this,  'generate_critical_css');
+		$this->CTRL->loader->add_action('admin_post_abovethefold_extract', $this,  'download_fullcss');
 
 		$this->CTRL->loader->add_action( 'admin_notices', $this, 'show_notices' );
 
@@ -87,17 +88,15 @@ class Abovethefold_Admin {
 				'settings_page'
 			));
 
-		} else {
-
-			/**
-			 * Add settings link to Settings tab
-			 */
-			add_options_page( __('Above The Fold', 'abovethefold'), __('Above The Fold Optimization', 'abovethefold'), 'manage_options', 'abovethefold', array(
-				&$this,
-				'settings_page'
-			));
-
 		}
+
+		/**
+		 * Add settings link to Settings tab
+		 */
+		add_submenu_page( 'tools.php',  __('Above The Fold Optimization', 'abovethefold'), __('Above The Fold', 'abovethefold'), 'manage_options', 'abovethefold', array(
+			&$this,
+			'settings_page'
+		));
 	}
 
 	public function register_settings() {
@@ -143,6 +142,88 @@ class Abovethefold_Admin {
 
 		wp_redirect(admin_url('admin.php?page=abovethefold'));
 		exit;
+    }
+
+    /**
+	 * Download Full CSS
+	 */
+    public function download_fullcss() {
+
+    	$options = get_site_option('abovethefold');
+		if (!is_array($options)) {
+			$options = array();
+		}
+
+		if ( get_magic_quotes_gpc() ) {
+			$_POST = array_map( 'stripslashes_deep', $_POST );
+			$_GET = array_map( 'stripslashes_deep', $_GET );
+			$_COOKIE = array_map( 'stripslashes_deep', $_COOKIE );
+			$_REQUEST = array_map( 'stripslashes_deep', $_REQUEST );
+		}
+
+		$input = $_POST['abovethefold'];
+		if (!is_array($input)) {
+			$input = array();
+		}
+
+		$urls = array();
+		$_urls = explode("\n",$input['genurls']);
+		foreach ($_urls as $url) {
+			if (trim($url) === '') { continue 1; }
+
+			$url = str_replace(get_option('siteurl'),'',$url);
+
+			if (preg_match('|^http(s)?:|Ui',$url)) {
+				add_settings_error(
+					'abovethefold',                     // Setting title
+					'urls_texterror',            // Error ID
+					'Invalid URL: ' . $url,     // Error message
+					'error'                         // Type of message
+				);
+				$error = true;
+			} else {
+				if (!preg_match('|^/|Ui',$url)) {
+					$url = '/' . $url;
+				}
+				$urls[] = $url;
+			}
+		}
+		if (empty($urls)) {
+			add_settings_error(
+				'abovethefold',                     // Setting title
+				'urls_texterror',            // Error ID
+				'You did not enter any paths.',     // Error message
+				'error'                         // Type of message
+			);
+			$error = true;
+		} else {
+			$options['genurls'] = implode("\n",$urls);
+		}
+
+		update_option('abovethefold',$options);
+
+		$this->options = $options;
+
+		if ($error) {
+			return;
+		}
+
+		/**
+		 * Generate Crtical CSS
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/penthouse.class.php';
+
+		$this->generator = new Abovethefold_Generator_Penthouse( $this );
+
+		$fullCSS = $this->generator->extract_fullcss();
+
+		ob_end_clean();
+
+		header('Content-disposition: attachment; filename=full-css-'.date('c').'.css');
+        header('Content-type: text/plain');
+        header('Content-length: '.strlen($fullCSS).'');
+
+        die($fullCSS);
     }
 
     /**
@@ -245,6 +326,23 @@ class Abovethefold_Admin {
 		exit;
 	}
 
+	public function settings_tabs( $current = 'homepage' ) {
+        $tabs = array(
+        	'settings' => 'Critical Path CSS Settings',
+        	'online' => 'Online Generator',
+			'server' => 'Server-side Generator',
+			'extract' => 'Extract Full CSS'
+        );
+        echo '<div id="icon-themes" class="icon32"><br></div>';
+        echo '<h2 class="nav-tab-wrapper">';
+        foreach( $tabs as $tab => $name ){
+            $class = ( $tab == $current ) ? ' nav-tab-active' : '';
+            echo "<a class='nav-tab$class' href='?page=abovethefold&tab=$tab'>$name</a>";
+
+        }
+        echo '</h2>';
+    }
+
 	public function settings_page() {
 		global $pagenow;
 
@@ -267,22 +365,24 @@ class Abovethefold_Admin {
 		);
 
 		// Get random post
-		$args = array( 'post_type' => 'post', 'numberposts' => 2, 'orderby' => 'rand' );
+		$args = array( 'post_type' => 'post', 'numberposts' => 1, 'orderby' => 'rand' );
 		query_posts($args);
 		if (have_posts()) {
 			while (have_posts()) {
 				the_post();
 				$default_paths[] = str_replace(get_option('siteurl'),'',get_permalink($post->ID));
+				break;
 			}
 		}
 
 		// Get random page
-		$args = array( 'post_type' => 'page', 'numberposts' => 2, 'orderby' => 'rand' );
+		$args = array( 'post_type' => 'page', 'numberposts' => 1, 'orderby' => 'rand' );
 		query_posts($args);
 		if (have_posts()) {
 			while (have_posts()) {
 				the_post();
 				$default_paths[] = str_replace(get_option('siteurl'),'',get_permalink($post->ID));
+				break;
 			}
 		}
 
@@ -302,6 +402,20 @@ class Abovethefold_Admin {
 
 <h2 class="option_title"><?php _e('Above The Fold Optimization', 'abovethefold') ?></h2>
 <p>This plugin enables to pass the "<em>Eliminate render-blocking JavaScript and CSS in above-the-fold content</em>"-rule from <a href="https://developers.google.com/speed/pagespeed/insights/" target="_blank">Google PageSpeed Insights</a> to be able to obtain a 90+ score using other optimization plugins such as <a href="plugin-install.php?tab=search&s=w3+total+cache">W3 Total Cache</a>.</p>
+<p><strong>Note:</strong> This plugin is intended to achieve the best possible result, not easy usage. It is intended for advanced WordPress users and optimization professionals.</p>
+<?php
+
+		if ( !isset ( $_GET['tab'] ) ) {
+			$_GET['tab'] = 'settings';
+		}
+
+		$this->settings_tabs($_GET['tab']);
+
+		switch(strtolower(trim($_GET['tab']))) {
+
+			case "settings":
+
+?>
 
 <div class="wrap abovethefold-wrapper">
 	<div class="metabox-holder">
@@ -309,7 +423,7 @@ class Abovethefold_Admin {
 			<div class="postbox">
 				<div class="inside" style="margin:0px;">
 					<p>Developed by <strong><a href="https://en.optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">Optimalisatie.nl</a></strong> - Website Optimization and Internationalization
-					<br />Contribute via <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization" target="_blank">Github</a> &dash; <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization/issues" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
+					<br />Contribute via <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization" target="_blank">Github</a> &dash; <a href="https://wordpress.org/support/plugin/above-the-fold-optimization" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
 				</div>
 			</div>
 		</div>
@@ -324,7 +438,7 @@ class Abovethefold_Admin {
 				<div id="post-body-content">
 					<div class="postbox">
 						<h3 class="hndle">
-							<span><?php _e( 'Critical Path CSS', 'abovethefold' ); ?></span><a name="criticalcss">&nbsp;</a>
+							<span><?php _e( 'Critical Path CSS Settings', 'abovethefold' ); ?></span><a name="criticalcss">&nbsp;</a>
 						</h3>
 						<div class="inside">
 
@@ -333,7 +447,7 @@ class Abovethefold_Admin {
 									<th scope="row">Inline CSS<?php if (trim($inlinecss) !== '') { print '<div style="font-size:11px;font-weight:normal;">'.size_format(strlen($inlinecss),2).'</div>'; } ?></th>
 									<td>
 										<textarea style="width: 100%;height:250px;font-size:11px;" name="abovethefold[css]"><?php echo htmlentities($inlinecss); ?></textarea>
-										<p class="description"><?php _e('Enter the Critical Path CSS-code to be inserted inline into the <code>&lt;head&gt;</code> of the page. You can generate Critical Path CSS online via Penthouse.js <a href="http://jonassebastianohlsson.com/criticalpathcssgenerator/" target="_blank">here</a>.', 'abovethefold'); ?></p>
+										<p class="description"><?php _e('Enter the Critical Path CSS-code to be inserted inline into the <code>&lt;head&gt;</code>. You can generate Critical Path CSS online via Penthouse.js <a href="http://jonassebastianohlsson.com/criticalpathcssgenerator/" target="_blank">here</a>.', 'abovethefold'); ?></p>
 									</td>
 								</tr>
 								<tr valign="top">
@@ -372,6 +486,86 @@ class Abovethefold_Admin {
 		</div> <!-- End of #poststuff -->
 	</div> <!-- End of .wrap .nginx-wrapper -->
 </form>
+<?php
+				break;
+
+				case "online":
+?>
+
+<form method="post" action="<?php echo admin_url('admin-post.php?action=abovethefold_extract'); ?>" class="clearfix">
+	<?php wp_nonce_field('abovethefold'); ?>
+	<div class="wrap abovethefold-wrapper">
+		<div id="poststuff">
+			<div id="post-body" class="metabox-holder">
+				<div id="post-body-content">
+					<div class="postbox">
+						<h3 class="hndle">
+							<span><?php _e( 'Online Critical Path CSS generator', 'abovethefold' ); ?></span>
+						</h3>
+						<div class="inside">
+
+							<p>If you do not have the ability to install Penthouse.js on your server you can use the <a href="http://jonassebastianohlsson.com/criticalpathcssgenerator/" target="_blank">online Penthouse.js-based generator</a> made available by <a href="https://jonassebastianohlsson.com/" target="_blank">Jonas Ohlsson</a>. It has no configuration options but it results in good quality Critical Path CSS code.<p>
+							<p>If you would like more configuration options you can look into Grunt.js en Gulp.js based solutions. <a href="https://www.google.com/search?q=grunt%20critical%20path%20css" target="_blank">Click here</a> for info.</p>
+
+							<strong>Instructions</strong>
+							<ol>
+								<li>Extract the full-CSS for the pages you want to create critical-path CSS for</li>
+								<li>Open <a href="http://jonassebastianohlsson.com/criticalpathcssgenerator/" target="_blank">http://jonassebastianohlsson.com/criticalpathcssgenerator/</a> and enter the full CSS into the <em>Full-CSS</em> field.</li>
+								<li>Click on the button <em>Generate Critical Path CSS</em></li>
+							</ol>
+
+							<p>You can extract the full CSS from any url by adding the query string <code><strong>?extract-css=<?php print md5(SECURE_AUTH_KEY . AUTH_KEY); ?>&amp;output=print</strong></code></p>
+
+							<table class="form-table">
+								<tr valign="top">
+									<th scope="row">
+										URL-paths
+										<div style="margin-top:10px;">
+											<a href="javascript:void(0);" class="button button-small" onclick="jQuery('#abovethefold_urls2').val(jQuery('#defaultpaths2').html());">Load random paths</a>
+											<div id="defaultpaths2" style="display:none;"><?php print implode("\n",$default_paths); ?></div>
+										</div>
+									</th>
+									<td>
+										<p style="margin-bottom:4px;">All paths must be located on the siteurl of the blog <code><?php print get_option('siteurl'); ?><strong><font color="blue">/path</font></strong></code> and execute the Above the fold plugin.</p>
+										<textarea name="abovethefold[genurls]" id="abovethefold_urls2" style="width:100%;height:100px;" /><?php echo esc_attr( ((isset($options['genurls'])) ? $options['genurls'] : '') ); ?></textarea>
+										<p class="description"><?php _e('Enter the paths to generate Critical Path CSS for. The resulting CSS-code for each URL is merged and compressed te create Critical Path CSS that is compatible for each page.', 'abovethefold'); ?></p>
+									</td>
+								</tr>
+							</table>
+
+							<hr />
+							<?php
+								submit_button( __( 'Extract &amp; Download Full CSS', 'abovethefold' ), 'primary large', 'download_fullcss', false );
+							?>
+						</div>
+					</div>
+
+	<!-- End of #post_form -->
+
+				</div>
+			</div> <!-- End of #post-body -->
+		</div> <!-- End of #poststuff -->
+	</div> <!-- End of .wrap .nginx-wrapper -->
+</form>
+
+
+<div class="wrap abovethefold-wrapper">
+	<div class="metabox-holder">
+		<div id="post-body-content" style="padding-bottom:0px;margin-bottom:0px;">
+			<div class="postbox">
+				<div class="inside" style="margin:0px;">
+					<p>Developed by <strong><a href="https://en.optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">Optimalisatie.nl</a></strong> - Website Optimization and Internationalization
+					<br />Contribute via <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization" target="_blank">Github</a> &dash; <a href="https://wordpress.org/support/plugin/above-the-fold-optimization" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<?php
+				break;
+
+				case "server":
+?>
 
 <form method="post" action="<?php echo admin_url('admin-post.php?action=abovethefold_generate'); ?>" class="clearfix">
 	<?php wp_nonce_field('abovethefold'); ?>
@@ -381,24 +575,22 @@ class Abovethefold_Admin {
 				<div id="post-body-content">
 					<div class="postbox">
 						<h3 class="hndle">
-							<span><?php _e( 'Critical Path CSS generation', 'abovethefold' ); ?></span>
+							<img src="<?php print plugins_url('above-the-fold-optimization/admin/ssh.png'); ?>" style="float:left;" />&nbsp;&nbsp;<span><?php _e( 'Server-side Critical Path CSS generator', 'abovethefold' ); ?></span>
 						</h3>
 						<div class="inside">
 
-							<p>The integrated Critical Path CSS generator is based on <a href="https://github.com/pocketjoso/penthouse" target="_blank">Penthouse.js</a> by <a href="https://github.com/pocketjoso" target="_blank">Jonas Ohlsson</a>. Other generators are <a href="https://github.com/addyosmani/critical" target="_blank">Critical</a> and <a href="https://github.com/filamentgroup/criticalcss" target="_blank">Critical CSS</a> which are available as Node.js and Grunt.js modules.<p>
+							<p>The integrated Critical Path CSS generator is based on <a href="https://github.com/pocketjoso/penthouse" target="_blank">Penthouse.js</a>. Other generators are <a href="https://github.com/addyosmani/critical" target="_blank">Critical</a> and <a href="https://github.com/filamentgroup/criticalcss" target="_blank">Critical CSS</a> which are available as Node.js and Grunt.js modules.<p>
 
 							<strong>How it works</strong>
-							<br />The functionality of the Critical Path CSS generator is described <a href="https://github.com/pocketjoso/penthouse" target="_blank">here</a>.
-							The plugin will execute Penthouse.js to generate Critical Path CSS for multiple responsive dimensions and pages, combines the resulting CSS-code and then compresses the CSS-code via Clean-CSS to achieve the smallest CSS-code to insert inline into the <code>&lt;head&gt;</code> of the page.
+							<br />The functionality of Penthouse.js is described <a href="https://github.com/pocketjoso/penthouse" target="_blank">here</a>.
+							The plugin will execute Penthouse.js to generate Critical Path CSS for multiple responsive dimensions and pages, combines the resulting CSS-code and then compresses the CSS-code via Clean-CSS.
 							When <em>Optimize CSS Delivery</em> is enabled all other CSS links are loaded asynchronously following the <a href="https://developers.google.com/speed/docs/insights/OptimizeCSSDelivery" target="_blank">recommendations by Google</a>.
 							<br />
 
 							<blockquote style="border:solid 1px #dfdfdf;background:#F8F8F8;padding:10px;padding-bottom:0px;">
-								<strong style="font-style:normal;">Automated CSS generation</strong>
-								<br />
-								Automated generation requires <a href="https://github.com/ariya/phantomjs" target="_blank">PhantomJS</a> to be installed on the server and executable by PHP. <strong><font color="red">This can be a security risk.</font></strong>
-								<br />It also requires <a href="https://github.com/jakubpawlowicz/clean-css" target="_blank">Clean-CSS</a> to be installed on the server and executable by PHP.
-								<p>As an alternative to automated generation you can select the option <a href="javascript:void(0);" class="button button-small">Generate CLI command</a> which will result in a command-line string that can be executed via SSH. The resulting CSS code can then be copied into the <a href="#criticalcss">Criticial CSS field</a>.</p>
+								Automated generation from within WordPress requires <a href="https://github.com/ariya/phantomjs" target="_blank">PhantomJS</a> and <a href="https://github.com/jakubpawlowicz/clean-css" target="_blank">Clean-CSS</a> to be executable by PHP. <strong><font color="red">This can be a security risk.</font></strong>
+								<p>As an alternative you can select the option <a href="javascript:void(0);" class="button button-small">Generate CLI command</a> which will result in a command-line string that can be executed via SSH.</p>
+								<p><strong><font color="red">Be very careful when executing commands via SSH. If you do not know what you are doing, consult a professional or your hosting provider.</font></strong></p>
 							</blockquote>
 
 							<table class="form-table">
@@ -418,9 +610,10 @@ class Abovethefold_Admin {
 										</div>
 									</th>
 									<td>
-										<p style="margin-bottom:4px;">All paths must be located on the siteurl of the blog <code><?php print get_option('siteurl'); ?><strong><font color="blue">/path</font></strong></code> and execute the Above the fold plugin. The plugin will output JSON for the Critical CSS generator.</p>
 										<textarea name="abovethefold[urls]" id="abovethefold_urls" style="width:100%;height:100px;" /><?php echo esc_attr( ((isset($options['urls'])) ? $options['urls'] : '') ); ?></textarea>
 										<p class="description"><?php _e('Enter the paths to generate Critical Path CSS for. The resulting CSS-code for each URL is merged and compressed te create Critical Path CSS that is compatible for each page.', 'abovethefold'); ?></p>
+										<p class="description">All paths must be located on the siteurl of the blog <code><?php print get_option('siteurl'); ?><strong><font color="blue">/path</font></strong></code> and execute the Above the fold plugin.</p>
+
 									</td>
 								</tr>
 								<tr valign="top">
@@ -463,7 +656,66 @@ class Abovethefold_Admin {
 		</div> <!-- End of #poststuff -->
 	</div> <!-- End of .wrap .nginx-wrapper -->
 </form>
+
+<div class="wrap abovethefold-wrapper">
+	<div class="metabox-holder">
+		<div id="post-body-content" style="padding-bottom:0px;margin-bottom:0px;">
+			<div class="postbox">
+				<div class="inside" style="margin:0px;">
+					<p>Developed by <strong><a href="https://en.optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">Optimalisatie.nl</a></strong> - Website Optimization and Internationalization
+					<br />Contribute via <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization" target="_blank">Github</a> &dash; <a href="https://wordpress.org/support/plugin/above-the-fold-optimization" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 <?php
+				break;
+
+				case "extract":
+                ?>
+
+                <form method="post" action="<?php echo admin_url('admin-post.php?action=abovethefold_extractcss'); ?>" class="clearfix">
+                	<?php wp_nonce_field('abovethefold'); ?>
+                	<div class="wrap abovethefold-wrapper">
+                		<div id="poststuff">
+                			<div id="post-body" class="metabox-holder">
+                				<div id="post-body-content">
+                					<div class="postbox">
+                						<h3 class="hndle">
+                							<span><?php _e( 'Extract Full CSS', 'abovethefold' ); ?></span>
+                						</h3>
+                						<div class="inside">
+
+                							<p>You can extract the full CSS from any url by adding the query string <code><strong>?extract-css=<?php print md5(SECURE_AUTH_KEY . AUTH_KEY); ?>&amp;output=print</strong></code>. The security code prevents scraping by robots.</p>
+
+                						</div>
+                					</div>
+
+                	<!-- End of #post_form -->
+
+                				</div>
+                			</div> <!-- End of #post-body -->
+                		</div> <!-- End of #poststuff -->
+                	</div> <!-- End of .wrap .nginx-wrapper -->
+                </form>
+
+
+                <div class="wrap abovethefold-wrapper">
+                	<div class="metabox-holder">
+                		<div id="post-body-content" style="padding-bottom:0px;margin-bottom:0px;">
+                			<div class="postbox">
+                				<div class="inside" style="margin:0px;">
+                					<p>Developed by <strong><a href="https://en.optimalisatie.nl/#utm_source=wordpress&utm_medium=link&utm_term=optimization&utm_campaign=Above%20the%20fold" target="_blank">Optimalisatie.nl</a></strong> - Website Optimization and Internationalization
+                					<br />Contribute via <a href="https://github.com/optimalisatie/wordpress-above-the-fold-optimization" target="_blank">Github</a> &dash; <a href="https://wordpress.org/support/plugin/above-the-fold-optimization" target="_blank">Report a bug</a> &dash; <a href="https://wordpress.org/support/view/plugin-reviews/above-the-fold-optimization?rate=5" target="_blank">Review this plugin</a></p>
+                				</div>
+                			</div>
+                		</div>
+                	</div>
+                </div>
+                <?php
+                break;
+			}
 
 	}
 
