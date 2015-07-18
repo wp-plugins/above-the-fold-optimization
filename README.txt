@@ -24,7 +24,7 @@ https://abovethefold.optimalisatie.nl/
 
 https://developers.google.com/speed/pagespeed/insights/?url=https%3A%2F%2Fabovethefold.optimalisatie.nl%2F&tab=mobile
 
-**Note:** `This plugin is intended to achieve the best possible result, not easy usage. It is intended for advanced WordPress users and optimization professionals.`
+**Note:** *This plugin is intended to achieve the best possible result, not easy usage. It is intended for advanced WordPress users and optimization professionals.*
 
 ### Automated Critical Path CSS generation
 
