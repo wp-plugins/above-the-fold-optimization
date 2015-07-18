@@ -402,7 +402,7 @@ class Abovethefold_Admin {
 
 <h2 class="option_title"><?php _e('Above The Fold Optimization', 'abovethefold') ?></h2>
 <p>This plugin enables to pass the "<em>Eliminate render-blocking JavaScript and CSS in above-the-fold content</em>"-rule from <a href="https://developers.google.com/speed/pagespeed/insights/" target="_blank">Google PageSpeed Insights</a> to be able to obtain a 90+ score using other optimization plugins such as <a href="plugin-install.php?tab=search&s=w3+total+cache">W3 Total Cache</a>.</p>
-<p><strong>Note:</strong> This plugin is intended to achieve the best possible result, not easy usage. It is intended for advanced WordPress users and optimization professionals.</p>
+<p><strong>Note:</strong> This plugin is intended to achieve the best possible result, not easy usage. It is intended for advanced WordPress users and optimization professionals. If you need help you can post a request on the <a href="https://wordpress.org/support/plugin/above-the-fold-optimization" target="_blank">support forum</a>.</p>
 <?php
 
 		if ( !isset ( $_GET['tab'] ) ) {
