@@ -90,6 +90,9 @@ class Abovethefold_Optimization {
 			return $buffer;
 		}
 
+		/**
+		 * Ignore List
+		 */
 		$rows = preg_split('#[\n|\s|,]#Ui',$this->CTRL->options['cssdelivery_ignore']);
 		$ignorelist = array();
 		foreach ($rows as $row) {
@@ -97,6 +100,18 @@ class Abovethefold_Optimization {
 				continue 1;
 			}
 			$ignorelist[] = trim($row);
+		}
+
+		/**
+		 * Delete List
+		 */
+		$rows = preg_split('#[\n|\s|,]#Ui',$this->CTRL->options['cssdelivery_remove']);
+		$deletelist = array();
+		foreach ($rows as $row) {
+			if (trim($row) === '') {
+				continue 1;
+			}
+			$deletelist[] = trim($row);
 		}
 
 		$search = array();
@@ -108,7 +123,7 @@ class Abovethefold_Optimization {
 		/**
 		 * Parse CSS links
 		 */
-		 $i = array();
+		$i = array();
 		$_styles = array();
 		if (preg_match_all('#(<\!--\[if[^>]+>)?([\s|\n]+)?<link([^>]+)href=[\'|"]([^\'|"]+)[\'|"]([^>]+)?>#is',$buffer,$out)) {
 			foreach ($out[4] as $n => $file) {
@@ -125,6 +140,21 @@ class Abovethefold_Optimization {
 						}
 					}
 					if ($ignore) {
+						continue;
+					}
+				}
+
+				if (!empty($deletelist)) {
+					$delete = false;
+					foreach ($deletelist as $_file) {
+						if (strpos($file,$_file) !== false) {
+							$delete = true;
+							break 1;
+						}
+					}
+					if ($delete) {
+						$search[] = '|<link[^>]+'.preg_quote($file).'[^>]+>|Ui';
+						$replace[] = '';
 						continue;
 					}
 				}
@@ -336,7 +366,7 @@ class Abovethefold_Optimization {
 		$url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 
 
-		$parsed = [];
+		$parsed = array();
 		parse_str(substr($url, strpos($url, '?') + 1), $parsed);
 		$extractkey = $parsed['extract-css'];
 		unset($parsed['extract-css']);

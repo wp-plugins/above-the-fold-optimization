@@ -131,6 +131,7 @@ class Abovethefold_Admin {
 
 		$options['cssdelivery'] = (isset($input['cssdelivery']) && intval($input['cssdelivery']) === 1) ? true : false;
 		$options['cssdelivery_ignore'] = trim(sanitize_text_field($input['cssdelivery_ignore']));
+		$options['cssdelivery_remove'] = trim(sanitize_text_field($input['cssdelivery_remove']));
 		$options['debug'] = (isset($input['debug']) && intval($input['debug']) === 1) ? true : false;
 
 		$css = trim(sanitize_text_field(stripslashes($input['css'])));
@@ -447,7 +448,7 @@ class Abovethefold_Admin {
 									<th scope="row">Inline CSS<?php if (trim($inlinecss) !== '') { print '<div style="font-size:11px;font-weight:normal;">'.size_format(strlen($inlinecss),2).'</div>'; } ?></th>
 									<td>
 										<textarea style="width: 100%;height:250px;font-size:11px;" name="abovethefold[css]"><?php echo htmlentities($inlinecss); ?></textarea>
-										<p class="description"><?php _e('Enter the Critical Path CSS-code to be inserted inline into the <code>&lt;head&gt;</code>. You can generate Critical Path CSS online via Penthouse.js <a href="http://jonassebastianohlsson.com/criticalpathcssgenerator/" target="_blank">here</a>.', 'abovethefold'); ?></p>
+										<p class="description"><?php _e('Enter the Critical Path CSS-code to be inserted inline into the <code>&lt;head&gt;</code> of the page.', 'abovethefold'); ?></p>
 									</td>
 								</tr>
 								<tr valign="top">
@@ -462,6 +463,13 @@ class Abovethefold_Admin {
 									<td>
 										<textarea style="width: 100%;height:50px;font-size:11px;" name="abovethefold[cssdelivery_ignore]"><?php echo htmlentities($options['cssdelivery_ignore']); ?></textarea>
 										<p class="description">Enter CSS-files to ignore in CSS delivery optimization.</p>
+									</td>
+								</tr>
+								<tr valign="top" class="cssdeliveryoptions" style="<?php if (isset($options['cssdelivery']) && intval($options['cssdelivery']) !== 1) { print 'display:none;'; } ?>">
+									<th scope="row">CSS-delivery Remove List</th>
+									<td>
+										<textarea style="width: 100%;height:50px;font-size:11px;" name="abovethefold[cssdelivery_remove]"><?php echo htmlentities($options['cssdelivery_remove']); ?></textarea>
+										<p class="description">Enter CSS-files to remove. This feature enables to include small plugin-CSS files inline.</p>
 									</td>
 								</tr>
 								<tr valign="top">

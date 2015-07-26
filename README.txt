@@ -59,6 +59,10 @@ To be able to generate Critical Path CSS from within the WordPress admin the sof
 
 == Changelog ==
 
+= 2.2.1 =
+* Added option to remove CSS files
+* CSS extraction bug (old PHP versions).
+
 = 2.2 =
 * Improved admin
 * Online generator instructions

@@ -84,7 +84,7 @@ class Abovethefold {
 	public function __construct() {
 
 		$this->plugin_name = 'abovethefold';
-		$this->version = '2.0';
+		$this->version = WPABOVETHEFOLD_VERSION;
 
 		/**
 		 * Disable plugin in admin or for testing
