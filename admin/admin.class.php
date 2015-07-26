@@ -462,7 +462,7 @@ class Abovethefold_Admin {
 									<th scope="row">CSS-delivery Ignore List</th>
 									<td>
 										<textarea style="width: 100%;height:50px;font-size:11px;" name="abovethefold[cssdelivery_ignore]"><?php echo htmlentities($options['cssdelivery_ignore']); ?></textarea>
-										<p class="description">Enter CSS-files to ignore in CSS delivery optimization.</p>
+										<p class="description">Enter CSS-files to ignore in CSS delivery optimization. The files will be left untouched in the HTML.</p>
 									</td>
 								</tr>
 								<tr valign="top" class="cssdeliveryoptions" style="<?php if (isset($options['cssdelivery']) && intval($options['cssdelivery']) !== 1) { print 'display:none;'; } ?>">
