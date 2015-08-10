@@ -41,6 +41,7 @@ class Abovethefold_LocalizeJSModule_GoogleAnalyticsJs extends Abovethefold_Local
 
 				break;
 				default:
+					$this->CTRL->loader->add_action('wp_head', $this, 'async_script', -1);
 					$this->CTRL->loader->add_action('wp_enqueue_scripts', $this, 'enqueue_script', -1);
 				break;
 			}
@@ -70,7 +71,13 @@ class Abovethefold_LocalizeJSModule_GoogleAnalyticsJs extends Abovethefold_Local
 <script type="text/javascript">
 (function(d,w,c){w['GoogleAnalyticsObject']=c;w[c]=w[c]||function(){
 (w[c].q=w[c].q||[]).push(arguments)},w[c].l=1*new Date();
+<?php
+	if ($this->CTRL->options['localizejs'][$this->classname]['enabled'] === 'async') {
+?>
 var s = d.createElement("script");s.type = "text/javascript";s.async = true;s.src = "<?php print addslashes($script_url); ?>";d.getElementsByTagName("head")[0].appendChild(s);
+<?php
+	}
+?>
 })(document,window,'ga');
 </script>
 <?php
