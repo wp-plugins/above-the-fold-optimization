@@ -1,7 +1,7 @@
 === Above The Fold Optimization ===
 Contributors: optimalisatie
 Donate link: https://en.optimalisatie.nl/
-Tags: optimization, above the fold, critical path, css, javascript localization
+Tags: optimization, above the fold, critical path, css, localization, javascript, minification, minify, minify css, minify stylesheet, optimize, speed, stylesheet, pagespeed, google pagespeed
 Requires at least: 3.0.1
 Tested up to: 4.2.4
 Stable tag: 4.3
