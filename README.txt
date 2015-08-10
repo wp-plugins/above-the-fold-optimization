@@ -1,7 +1,7 @@
 === Above The Fold Optimization ===
 Contributors: optimalisatie
 Donate link: https://en.optimalisatie.nl/
-Tags: optimization, above the fold, critical path, css
+Tags: optimization, above the fold, critical path, css, javascript localization
 Requires at least: 3.0.1
 Tested up to: 4.2.4
 Stable tag: 4.3
@@ -22,15 +22,15 @@ The plugin is intended to work together with other optimization plugins such as 
 
 ### Critical Path CSS generation
 
-The plugin enables automated Critical Path CSS generation via [Penthouse.js](https://github.com/pocketjoso/penthouse). The plugin will execute Penthouse.js to generate Critical Path CSS for multiple responsive dimensions and pages, combines the resulting CSS-code and then compresses the CSS-code via [Clean-CSS](https://github.com/jakubpawlowicz/clean-css).
+The plugin enables automated Critical Path CSS generation via [Penthouse.js](https://github.com/pocketjoso/penthouse). The plugin will execute Penthouse.js to generate Critical Path CSS for multiple responsive dimensions and pages. It then combines the resulting CSS-code and then compresses the CSS-code via [Clean-CSS](https://github.com/jakubpawlowicz/clean-css).
 
 ### Full CSS extraction
 
-The plugin enables to extract the Full CSS from pages for use in critical path CSS generation.
+The plugin enables to extract the full CSS from pages for use in critical path CSS generation.
 
 ### Javascript localization
 
-The plugin enables to localize external javascript resources such as Google Analytics to pass the "`[Leverage browser caching](https://developers.google.com/speed/docs/insights/LeverageBrowserCaching)`"-rule from Google PageSpeed Insights.
+The plugin enables the localization of external javascript resources such as Google Analytics and Facebook SDK to pass the "[Leverage browser caching](https://developers.google.com/speed/docs/insights/LeverageBrowserCaching)"-rule from Google PageSpeed Insights.
 
 == Installation ==
 
