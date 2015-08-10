@@ -15,10 +15,10 @@ class Abovethefold_LocalizeJSModule_GoogleWebfont extends Abovethefold_LocalizeJ
 
 	// The name of the module
 	public $name = 'Google Webfont API (webfont.js)';
-	public $link = 'https://developers.google.com/fonts/docs/webfont_loader';
+	public $link = 'https://github.com/typekit/webfontloader';
 
 	public $update_interval = 86400; // once per day
-	public $script_source = 'https://github.com/typekit/webfontloader';
+	public $script_source = 'http://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
 	public $version = '1';
 
 	public $snippets = array();
