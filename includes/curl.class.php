@@ -45,7 +45,7 @@ class Abovethefold_Curl {
 	 */
 	public function ua() {
 		$uas = array();
-		$uas[] = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0) - Above The Fold Optimization Plugin';
+		$uas[] = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)';
 		return $uas[array_rand($uas,1)];
 	}
 

@@ -175,9 +175,23 @@ class Abovethefold_Optimization {
 				$replace[] = '';
 			}
 		}
-		//return var_export($i,true);
+
+		/**
+		 * Remove duplicate CSS files
+		 */
+		$reflog = array();
+		$styles = array();
+		foreach ($_styles as $link) {
+			$hash = md5($link[1]);
+			if (isset($reflog[$hash])) {
+				continue 1;
+			}
+			$reflog[$hash] = 1;
+			$styles[] = $link;
+		}
+
 		$search[] = '|var CRITICALCSS;|Ui';
-		$replace[] = 'var CRITICALCSS = '.json_encode($_styles).';';
+		$replace[] = 'var CRITICALCSS = '.json_encode($styles).';';
 
 		$buffer = preg_replace($search,$replace,$buffer);
 
@@ -195,6 +209,14 @@ class Abovethefold_Optimization {
 			// Not valid HTML
 			return $HTML;
 		}
+
+        $files = false;
+		if (isset($_REQUEST['files'])) {
+        	$files = explode(',',$_REQUEST['files']);
+        	if (!is_array($files) || empty($files)) {
+        		$files = false;
+        	}
+        }
 
 		$siteurl = get_option('siteurl');
 
@@ -214,6 +236,7 @@ class Abovethefold_Optimization {
 		$csscode = array();
 
 		$cssfiles = array();
+		$reflog = array();
 
 		$remove = array();
 		foreach ($stylesheets as $sheet) {
@@ -263,6 +286,12 @@ class Abovethefold_Optimization {
 					$url = $siteurl.$url;
 				}
 
+				$hash = md5($url);
+				if (isset($reflog[$hash])) {
+					continue 1;
+				}
+				$reflog[$hash] = 1;
+
 				/**
 				 * External URL
 				 *
@@ -278,6 +307,10 @@ class Abovethefold_Optimization {
 						continue 1;
 					}
 
+					if ($files && !in_array(md5($url),$files)) {
+						continue 1;
+					}
+
 					$csscode[] = array($media,$css);
 
 				} else {
@@ -286,10 +319,15 @@ class Abovethefold_Optimization {
 
 					$css = file_get_contents($path);
 
+					if ($files && !in_array(md5($url),$files)) {
+						continue 1;
+					}
+
 					$csscode[] = array($media,$css);
 				}
 
 				if (isset($_REQUEST['output']) && strtolower($_REQUEST['output']) === 'print') {
+
 					$cssfiles[] = array(
 						'src' => $url,
 						'code' => $css,
@@ -324,17 +362,35 @@ class Abovethefold_Optimization {
 
 			$code = $style->nodeValue;
 
+			$hash = md5($code);
+			if (isset($reflog[$hash])) {
+				continue 1;
+			}
+			$reflog[$hash] = 1;
+
+			if (strpos($code,'* Above The Fold Optimization') !== false) {
+				continue 1;
+			}
+
 			$code = preg_replace('#.*<!\[CDATA\[(?:\s*\*/)?(.*)(?://|/\*)\s*?\]\]>.*#sm','$1',$code);
+
+			$xdoc = new DOMDocument();
+			$xdoc->appendChild($xdoc->importNode($style, true));
+			$inlinecode = $xdoc->saveHTML();
+
+			if ($files && !in_array(md5($inlinecode),$files)) {
+				continue 1;
+			}
+
 			$csscode[] = array($media,$code);
 
             if (isset($_REQUEST['output']) && strtolower($_REQUEST['output']) === 'print') {
-				$xdoc = new DOMDocument();
-				$xdoc->appendChild($xdoc->importNode($style, true));
 
 				$cssfiles[] = array(
 					'src' => md5($code),
 					'inline' => true,
-					'code' => $xdoc->saveHTML(),
+					'code' => $inlinecode,
+					'inlinecode' => $code,
 					'media' => $media
 				);
 			}
@@ -365,7 +421,6 @@ class Abovethefold_Optimization {
 
 		$url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 
-
 		$parsed = array();
 		parse_str(substr($url, strpos($url, '?') + 1), $parsed);
 		$extractkey = $parsed['extract-css'];
@@ -388,6 +443,7 @@ class Abovethefold_Optimization {
 			}
 
 			return $inlineCSS;
+
 		} else if (isset($_REQUEST['output']) && strtolower($_REQUEST['output']) === 'print') {
 
 function human_filesize($bytes, $decimals = 2) {
@@ -399,12 +455,30 @@ function human_filesize($bytes, $decimals = 2) {
 			$cssoutput = '<html>
 <head>
 <title>Full CSS extraction</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script type="text/javascript">
+function update_fullcss() {
+	var css = \'\';
+	jQuery.each(jQuery(\'input[name=css]:checked\'),function(i,el) {
+		css += \'/**\\n * \' + jQuery(\'#code\'+jQuery(el).val()).attr(\'title\') + \'\\n */\\n \' + jQuery(\'#code\'+jQuery(el).val()).val() + \'\\n\\n\';
+	});
+	jQuery(\'#fullcss\').val(css);
+}
 function show_inline(id) {
 	var w = window.open();
 	w.document.open(\'about:blank\',\'cssdisplay\');
 	w.document.write(document.getElementById(id).value);
 	w.document.close();
+}
+function download_css() {
+	var cssstr = \'\';
+	jQuery.each(jQuery(\'input[name=css]:checked\'),function(i,el) {
+		if (cssstr) {
+			cssstr += \',\';
+		}
+		cssstr += jQuery(el).val();
+	});
+	document.location.href = \''.$url.'?extract-css='.$extractkey.'&output=download&files=\' + cssstr;
 }
 </script>
 </head>
@@ -419,14 +493,16 @@ function show_inline(id) {
 			foreach($cssfiles as $file) {
 
 				if ($file['inline']) {
-					$cssoutput .= '<textarea style="display:none;" id="inline'.$file['src'].'">'.htmlentities(htmlentities($file['code'])).'</textarea>
-					<div>
-						Inline <a href="javascript:void(0);" onclick="show_inline(\'inline'.$file['src'].'\');">'.$file['src'].'</a> ('.human_filesize(strlen($file['code']), 2).') - Media: '.implode(', ',$file['media']).'
-					</div>';
+					$cssoutput .= '<textarea style="display:none;" id="inline'.$file['src'].'_display">'.htmlentities(htmlentities($file['code'])).'</textarea>
+					<textarea style="display:none;" id="code'.md5($file['code']).'" title="' . $file['src'] . ' ('.human_filesize(strlen($file['inlinecode']), 2).')">'.htmlentities($file['inlinecode']).'</textarea>
+					<label style="display:block;border-bottom:solid 1px #efefef;padding-bottom:5px;margin-bottom:5px;">
+						<input type="checkbox" name="css" value="'.md5($file['code']).'" checked="true"> Inline <a href="javascript:void(0);" onclick="show_inline(\'inline'.$file['src'].'_display\');">'.$file['src'].'</a> ('.human_filesize(strlen($file['inlinecode']), 2).') - Media: '.implode(', ',$file['media']).'
+					</label>';
 				} else {
-					$cssoutput .= '<div>
-						<a href="'.$file['src'].'" target="_blank">'.$file['src'].'</a> ('.human_filesize(strlen($file['code']), 2).') - Media: '.implode(', ',$file['media']).'
-					</div>';
+					$cssoutput .= '<textarea style="display:none;" id="code'.md5($file['src']).'" title="'.$file['src'].' ('.human_filesize(strlen($file['code']), 2).')">'.htmlentities($file['code']).'</textarea>
+					<label style="display:block;border-bottom:solid 1px #efefef;padding-bottom:5px;margin-bottom:5px;">
+						<input type="checkbox" name="css" value="'.md5($file['src']).'" checked="true"> <a href="'.$file['src'].'" target="_blank">'.$file['src'].'</a> ('.human_filesize(strlen($file['code']), 2).') - Media: '.implode(', ',$file['media']).'
+					</label>';
 				}
 
 			}
@@ -436,13 +512,11 @@ $cssoutput .= '
 
 <br />
 <fieldset>
-<legend>Full CSS</legend>
-<textarea style="width:100%;height:300px;">
-'.htmlentities($inlineCSS).'
-</textarea>
+<legend>Full CSS (<span id="fullcsssize"></span>)</legend>
+<textarea style="width:100%;height:300px;" id="fullcss"></textarea>
 
 	<div style="padding:10px;text-align:center;">
-		<a href="'.$url.'?extract-css='.$extractkey.'&amp;output=download">Download</a>
+		<a href="'.$url.'?extract-css='.$extractkey.'&amp;output=download" onclick="download_css(); return false;">Download</a>
 	</div>
 
 </fieldset>
@@ -452,7 +526,14 @@ $cssoutput .= '
 	<a href="http://jonassebastianohlsson.com/criticalpathcssgenerator/" target="_blank">Critical Path CSS Generator</a>
 </div>
 
-
+<script type="text/javascript">
+	setTimeout(function() {
+		update_fullcss();
+	},100);
+	jQuery(\'input[name=css]\').on(\'change\',function() {
+		update_fullcss();
+	});
+</script>
 </body>
 </html>';
 
@@ -486,21 +567,14 @@ $cssoutput .= '
  */
 <?php if (file_exists($cssfile)) { print file_get_contents($cssfile); } ?></style>
 <script type="text/javascript"><?php print file_get_contents(plugin_dir_path( dirname( __FILE__ ) ) . 'public/js/abovethefold.min.js'); ?> var CRITICALCSS;
-<?php if (is_admin() && intval($this->CTRL->options['debug']) === 1) { print 'window.abovethefold.debug = true;'; } ?>
+<?php if (is_admin() && intval($this->CTRL->options['debug']) === 1) { print 'window.abovethefold.debug = true;'; }
+if ($this->CTRL->options['cssdelivery_position'] === 'header') {
+	print "if (window['abovethefold']) { window['abovethefold'].css(CRITICALCSS); }";
+}
+?>
 </script>
 <?php //
 	}
-
-	/**
-	 * Buffer end
-	 *
-	 * @since    1.0
-	 */
-	/*public function bufferend( ) {
-		if ($this->buffertype === 'ob') {
-			ob_end_flush();
-		}
-	}*/
 
 	/**
 	 * WordPress Footer hook
@@ -512,9 +586,9 @@ $cssoutput .= '
 	public function footer() {
 		if ($this->OPTIMIZE->noop) { return; }
 
-		print '<script type="text/javascript">';
-		print "if (window['abovethefold']) { window['abovethefold'].css(CRITICALCSS); }";
-		print '</script>';
+		if (empty($this->CTRL->options['cssdelivery_position']) || $this->CTRL->options['cssdelivery_position'] === 'footer') {
+        	print "<script type=\"text/javascript\">if (window['abovethefold']) { window['abovethefold'].css(CRITICALCSS); }</script>";
+        }
 
 	}
 
@@ -532,6 +606,148 @@ $cssoutput .= '
 	public function autoptimize_skip_js($excludeJS) {
 		$excludeJS .= ',css(CRITICALCSS),var CRITICALCSS';
 		return $excludeJS;
+	}
+
+	/**
+	 * Extract Google fonts from CSS
+	 */
+	public function extract_google_fonts($css) {
+
+		$googlefonts = array();
+
+		if (preg_match_all('#(?:@import)(?:\\s)(?:url)?(?:(?:(?:\\()(["\'])?(?:[^"\')]+)\\1(?:\\))|(["\'])(?:.+)\\2)(?:[A-Z\\s])*)+(?:;)#Ui',$css,$out) && !empty($out[0])) {
+
+			foreach ($out[0] as $n => $fontLink) {
+				if (substr_count($fontLink, "fonts.googleapis.com/css") > 0) {
+					$fontLink = preg_replace('|^.*(//fonts\.[^\s\'\"\)]+)[\s\|\'\|\"\|\)].*|is','$1',$fontLink);
+					$googlefonts[] = $fontLink;
+				}
+			}
+
+			if (!empty($googlefonts)) {
+
+				$fonts = '';
+				foreach ($googlefonts as $font) {
+					$fonts .= '<link rel="stylesheet" type="text/css" href="'.htmlentities($font).'" />';
+				}
+
+				$html = '<html><head><title>Fonts 2</title>'.$fonts.'</head><body></body></html>';
+				$fonts = GWFO::googlefonts_find_google_fonts($html);
+
+				return $fonts;
+
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Autoptimize: process CSS (@imports of Google fonts etc.)
+	 */
+	 public function autoptimize_process_css($css) {
+
+	 	if ($this->CTRL->options['gwfo']) {
+
+			/**
+			 * Parse fonts with Google Webfont Optimizer function
+			 */
+			$fonts = $this->extract_google_fonts($css);
+
+			$GWFOQUE = get_option('abovethefold_gwfo_que');
+
+			if (empty($GWFOQUE)) {
+				$GWFOQUE = array();
+			}
+
+			if (!empty($fonts)) {
+				$GWFOQUE[] = $fonts;
+				$css = preg_replace('#(?:@import)(?:\\s)(?:url)?(?:(?:(?:\\()(["\'])?(?:[^"\')]+)\\1(?:\\))|(["\'])(?:.+)\\2)(?:[A-Z\\s])*)+(?:;)#Ui','',$css);
+			}
+
+			$GWFOQUE = array_unique($GWFOQUE);
+			update_option('abovethefold_gwfo_que',$GWFOQUE);
+		}
+
+		return $css;
+
+	 }
+
+
+	/**
+	 * Autoptimize: process Javascript
+	 */
+	 public function autoptimize_process_js($js) {
+
+		/**
+		 * Localize Javascript
+		 */
+		if ($this->CTRL->options['localizejs']['enabled']) {
+			$js = $this->CTRL->localizejs->parse_js($js);
+		}
+
+		return $js;
+
+	 }
+
+	/**
+	 * Autoptimize: process HTML
+	 */
+	public function autoptimize_process_html($html) {
+
+		/**
+		 * Include @import of Google Fonts in optimized delivery via the plugin Google Webfont Optimizer
+		 */
+		if ($this->CTRL->options['gwfo']) {
+
+			$GWFOQUE = get_option('abovethefold_gwfo_que');
+
+			if (!empty($GWFOQUE)) {
+
+				if (preg_match('|WebFontConfig = \{[^<]+families: (\[[^\]]+\])|is',$html,$out)) {
+
+					$json = $out[1];
+					$newJSON = '';
+
+					$jsonLength = strlen($out[1]);
+					for ($i = 0; $i < $jsonLength; $i++) {
+						if ($json[$i] == '"' || $json[$i] == "'") {
+							$nextQuote = strpos($json, $json[$i], $i + 1);
+							$quoteContent = substr($json, $i + 1, $nextQuote - $i - 1);
+							$newJSON .= '"' . str_replace('"', "'", $quoteContent) . '"';
+							$i = $nextQuote;
+						} else {
+							$newJSON .= $json[$i];
+						}
+					}
+
+					$json = json_decode($newJSON,true);
+
+					$newJSON = array_unique($json);
+
+					if (!is_array($json)) {
+						$json = array();
+					}
+				}
+
+				foreach ($GWFOQUE as $qn => $data) {
+					foreach ($data['google'] as $font) {
+						$json[] = $font;
+					}
+				}
+
+				$html = preg_replace('|(WebFontConfig = \{[^<]+families: )(\[[^\]]+\])|is','$1' . json_encode($json),$html);
+			}
+		}
+
+		/**
+		 * Localize Javascript
+		 */
+		if ($this->CTRL->options['localizejs']['enabled']) {
+			$html = $this->CTRL->localizejs->parse_html($html);
+		}
+
+		return $html;
 	}
 
 }

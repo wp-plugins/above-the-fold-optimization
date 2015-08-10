@@ -118,6 +118,10 @@ class Abovethefold {
 			$this->define_optimization_hooks();
 		}
 
+		// Localize Javascript
+		$this->localizejs = new Abovethefold_LocalizeJS( $this );
+
+
 	}
 
 	/**
@@ -153,6 +157,12 @@ class Abovethefold {
 		 * The class responsible for defining all actions related to optimization.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/optimization.class.php';
+
+		/**
+		 * The class responsible Javascript localization.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/localizejs.class.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'modules/localizejs.class.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the Dashboard.
@@ -225,6 +235,22 @@ class Abovethefold {
 		 * Autoptimize: skip Critical Path Javascript
 		 */
 		$this->loader->add_filter( 'autoptimize_filter_js_exclude', $plugin_optimization, 'autoptimize_skip_js' );
+
+
+		/**
+		 * Autoptimize: process @import (Google fonts etc)
+		 */
+         $this->loader->add_filter( 'autoptimize_css_after_minify', $plugin_optimization, 'autoptimize_process_css' );
+
+		/**
+		 * Autoptimize: process Javascript
+		 */
+         $this->loader->add_filter( 'autoptimize_js_after_minify', $plugin_optimization, 'autoptimize_process_js' );
+
+		/**
+		 * Autoptimize: process HTML
+		 */
+         $this->loader->add_filter( 'autoptimize_html_after_minify', $plugin_optimization, 'autoptimize_process_html' );
 
 	}
 
