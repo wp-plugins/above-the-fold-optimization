@@ -51,8 +51,9 @@ To be able to generate Critical Path CSS from within the WordPress admin the sof
 
 == Screenshots ==
 
-1. Automated Critical Path CSS generation from within the WordPress admin.
-2. Inline CSS configuration and optimization.
+1. Critical Path CSS settings, Google font optimization, javascript localization
+2. Automated critical path CSS generation via Penthouse.js
+3. Full CSS extraction
 
 == Changelog ==
 
