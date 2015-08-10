@@ -26,7 +26,7 @@ The plugin enables automated Critical Path CSS generation via [Penthouse.js](htt
 
 ### Full CSS extraction
 
-The plugin enables to extract the full CSS from pages for use in critical path CSS generation.
+The plugin enables the extraction of the full CSS from pages for use in critical path CSS generation.
 
 ### Javascript localization
 
