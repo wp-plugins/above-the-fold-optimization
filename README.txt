@@ -57,6 +57,9 @@ To be able to generate Critical Path CSS from within the WordPress admin the sof
 
 == Changelog ==
 
+= 2.3.2 =
+* Repair of previous incomplete update.
+
 = 2.3.1 =
 * Added javascript localization modules.
 
