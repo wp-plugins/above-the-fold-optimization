@@ -40,6 +40,15 @@ class Abovethefold_LocalizeJSModule {
 	public $cachepath;
 
 	/**
+	 * Source url variables
+	 *
+	 * @since    2.3
+	 * @access   public
+	 * @var      array
+	 */
+	public $source_variables = array();
+
+	/**
 	 * Download retry interval
 	 */
 	public $retry_interval = 30;

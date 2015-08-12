@@ -74,25 +74,9 @@ class Abovethefold_LocalizeJSModule_FacebookSdk extends Abovethefold_LocalizeJSM
 
 		// hash from module file
 		$hash = md5(__FILE__);
-		$script_file = $this->cachepath . $hash . '-'.$this->classname.'-v'.$this->version.'.js';
+		$script_file = $this->cachepath . $hash . '-'.$this->classname.'-'.$this->lang.'.js';
 
 		return $script_file;
-
-	}
-
-	/**
-	 * Get script
-	 */
-	public function get_script( $return_url = false ) {
-
-		$script_file = $this->get_script_filename( );
-		$script_time = $this->update_script( $script_file );
-
-		if ($return_url) {
-			$script_file = str_replace(ABSPATH, rtrim(get_option('siteurl'),'/') . '/', $script_file);
-		}
-
-		return array($script_file,$script_time);
 
 	}
 

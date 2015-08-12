@@ -68,7 +68,7 @@ class Abovethefold_LocalizeJSModule_GoogleAnalyticsJs extends Abovethefold_Local
 		list($script_url, $script_time) = $this->get_script( true );
 
 ?>
-<script type="text/javascript">
+<script>
 (function(d,w,c){w['GoogleAnalyticsObject']=c;w[c]=w[c]||function(){
 (w[c].q=w[c].q||[]).push(arguments)},w[c].l=1*new Date();
 <?php

@@ -57,6 +57,9 @@ To be able to generate Critical Path CSS from within the WordPress admin the sof
 
 == Changelog ==
 
+= 2.3.1 =
+* Added javascript localization modules.
+
 = 2.3 =
 * Added option to include Google fonts from ``@import`` within the CSS-code in [Google Webfont Optimizer](https://nl.wordpress.org/plugins/google-webfont-optimizer/).
 * Added option to localize external javascript files.
