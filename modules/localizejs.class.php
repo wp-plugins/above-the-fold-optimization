@@ -81,6 +81,38 @@ class Abovethefold_LocalizeJSModule {
 	}
 
 	/**
+	 * Get script filename
+	 */
+	public function get_script_filename( ) {
+
+		// hash from module file
+		$hash = md5(__FILE__);
+		$script_file = $this->cachepath . $hash . '-'.$this->classname.'.js';
+
+		return $script_file;
+
+	}
+
+	/**
+	 * Get script
+	 */
+	public function get_script( $return_url = false ) {
+
+		// hash from module file
+		$hash = md5(__FILE__);
+
+		$script_file = $this->get_script_filename( );
+		$script_time = $this->update_script( $script_file );
+
+		if ($return_url) {
+			$script_file = str_replace(ABSPATH, rtrim(get_option('siteurl'),'/') . '/', $script_file);
+		}
+
+		return array($script_file,$script_time);
+
+	}
+
+	/**
 	 * Localize javascript file
 	 *
 	 * @since    2.3

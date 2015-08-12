@@ -85,25 +85,6 @@ var s = d.createElement("script");s.type = "text/javascript";s.async = true;s.sr
 	}
 
 	/**
-	 * Get script
-	 */
-	public function get_script( $return_url = false ) {
-
-		// hash from module file
-		$hash = md5(__FILE__);
-
-		$script_file = $this->cachepath . $hash . '-'.$this->classname.'.js';
-		$script_time = $this->update_script( $script_file );
-
-		if ($return_url) {
-			$script_file = str_replace(ABSPATH, rtrim(get_option('siteurl'),'/') . '/', $script_file);
-		}
-
-		return array($script_file,$script_time);
-
-	}
-
-	/**
 	 * Parse Google Analytics javascript and return original code (to replace) and file-URL.
 	 *
 	 * @since 2.3

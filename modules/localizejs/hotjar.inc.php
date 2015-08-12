@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Hotjar (Google Font API)
+ * Hotjar (Heatmaps)
  *
  * @since      2.3
  * @package    abovethefold
@@ -86,21 +86,6 @@ class Abovethefold_LocalizeJSModule_Hotjar extends Abovethefold_LocalizeJSModule
 
 	}
 
-	/**
-	 * Get script
-	 */
-	public function get_script( $return_url = false ) {
-
-		$script_file = $this->get_script_filename( );
-		$script_time = $this->update_script( $script_file );
-
-		if ($return_url) {
-			$script_file = str_replace(ABSPATH, rtrim(get_option('siteurl'),'/') . '/', $script_file);
-		}
-
-		return array($script_file,$script_time);
-
-	}
 
 	/**
 	 * Parse javascript code
