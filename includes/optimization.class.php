@@ -605,6 +605,11 @@ if ($this->CTRL->options['cssdelivery_position'] === 'header') {
 	 */
 	public function autoptimize_skip_js($excludeJS) {
 		$excludeJS .= ',css(CRITICALCSS),var CRITICALCSS';
+
+		if ($this->CTRL->options['gwfo']) {
+			$excludeJS .= ',WebFontConfig';
+		}
+
 		return $excludeJS;
 	}
 
